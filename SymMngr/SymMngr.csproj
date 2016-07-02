@@ -35,6 +35,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
     <Compile Include="Natives\DbgHelp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SymbolHandler.cs" />
