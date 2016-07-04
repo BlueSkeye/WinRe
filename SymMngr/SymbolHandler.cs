@@ -29,17 +29,23 @@ namespace SymMngr
             set { SetHomeDirectory(DbgHelp.DirectoryType.Base, value); }
         }
 
+        public Option Options
+        {
+            get { return Natives.DbgHelp.SymGetOptions(); }
+            set { Natives.DbgHelp.SymSetOptions(value); }
+        }
+
         public string SearchPath
         {
             get
             {
-                return GetStringProperty(delegate (IntPtr buffer, int bufferLength) {
-                    return DbgHelp.SymGetSearchPath(base.handle, buffer, bufferLength);
+                return GetStringProperty(delegate (IntPtr at, int bufferLength) {
+                    return DbgHelp.SymGetSearchPath(base.handle, at, bufferLength);
                 });
             }
             set
             {
-                lock (_globalLock) {
+                lock (Globals.DebugHelpLock) {
                     if (!Natives.DbgHelp.SymSetSearchPath(base.handle, value)) {
                         throw new SymbolHandlingException();
                     }
@@ -61,33 +67,33 @@ namespace SymMngr
 
         private string GetHomeDirectory(DbgHelp.DirectoryType kind)
         {
-            return GetStringProperty(delegate (IntPtr buffer, int bufferLength) {
-                return (IntPtr.Zero != DbgHelp.SymGetHomeDirectory(kind, buffer, bufferLength));
+            return GetStringProperty(delegate (IntPtr at, int bufferLength) {
+                return (IntPtr.Zero != DbgHelp.SymGetHomeDirectory(kind, at, bufferLength));
             });
         }
 
         private string GetStringProperty(GetStringPropertyDelegate getter)
         {
             int bufferLength = Constants.OneKiloBytes;
-            IntPtr buffer = IntPtr.Zero;
+            IntPtr at = IntPtr.Zero;
             string result;
             do {
                 try {
-                    buffer = Marshal.AllocCoTaskMem(bufferLength * sizeof(char));
-                    lock (_globalLock)  {
-                        if (!getter(buffer,bufferLength)) {
+                    at = Marshal.AllocCoTaskMem(bufferLength * sizeof(char));
+                    lock (Globals.DebugHelpLock)  {
+                        if (!getter(at,bufferLength)) {
                             throw new SymbolHandlingException();
                         }
                     }
-                    result = Marshal.PtrToStringUni(buffer);
+                    result = Marshal.PtrToStringUni(at);
                     bufferLength += Constants.OneKiloBytes;
                     if (Constants.SixtyFourKiloBytes <= bufferLength) {
                         throw new SymbolHandlingException();
                     }
                 }
                 finally {
-                    if (IntPtr.Zero != buffer) {
-                        Marshal.FreeCoTaskMem(buffer);
+                    if (IntPtr.Zero != at) {
+                        Marshal.FreeCoTaskMem(at);
                     }
                 }
             }
@@ -102,7 +108,7 @@ namespace SymMngr
                 searchPathBuilder = new StringBuilder();
             }
             int thisHandleValue;
-            lock (_globalLock) {
+            lock (Globals.DebugHelpLock) {
                 _lastAllocatedHandle += IntPtr.Size;
                 thisHandleValue = _lastAllocatedHandle;
             }
@@ -118,11 +124,21 @@ namespace SymMngr
             throw new SymbolHandlingException();
         }
 
+        public void LoadModule(string imageName, string moduleName, ulong at, uint size)
+        {
+            ulong loadedAt = Natives.DbgHelp.SymLoadModuleEx(base.handle, IntPtr.Zero,
+                imageName, moduleName, at, size, IntPtr.Zero, 0);
+            if ((0 == loadedAt) && (0 != Marshal.GetLastWin32Error())) {
+                throw new SymbolHandlingException();
+            }
+            return;
+        }
+
         protected override bool ReleaseHandle()
         {
             if (IntPtr.Zero == base.handle) { return true; }
             bool success;
-            lock (_globalLock) { success = DbgHelp.SymCleanup(handle); }
+            lock (Globals.DebugHelpLock) { success = DbgHelp.SymCleanup(handle); }
             if (success) {
                 return true;
             }
@@ -133,17 +149,16 @@ namespace SymMngr
 
         private void SetHomeDirectory(DbgHelp.DirectoryType kind, string newHome)
         {
-            lock (_globalLock) {
+            lock (Globals.DebugHelpLock) {
                 if (IntPtr.Zero == Natives.DbgHelp.SymSetHomeDirectory(kind, newHome)) {
                     throw new SymbolHandlingException();
                 }
             }
         }
 
-        private static object _globalLock = new object();
         private static int _lastAllocatedHandle = 1;
 
-        private delegate bool GetStringPropertyDelegate(IntPtr buffer, int bufferLength);
+        private delegate bool GetStringPropertyDelegate(IntPtr at, int bufferLength);
 
         private class LoadedModule
         {
@@ -276,7 +291,6 @@ namespace SymMngr
 //SymGetModuleBase64
 //SymGetModuleInfo64
 //SymGetOmaps
-//SymGetOptions
 //SymGetScope
 //SymGetSymbolFile
 //SymGetTypeFromName
@@ -293,7 +307,6 @@ namespace SymMngr
 //SymRegisterFunctionEntryCallback64
 //SymSearch
 //SymSetContext
-//SymSetOptions
 //SymSetScopeFromAddr
 //SymSetScopeFromIndex
 //SymUnDName64

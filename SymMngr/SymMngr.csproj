@@ -36,10 +36,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Globals.cs" />
+    <Compile Include="ImageHelpers.cs" />
+    <Compile Include="LoadedImage.cs" />
     <Compile Include="Natives\DbgHelp.cs" />
+    <Compile Include="PE\Characteristics.cs" />
+    <Compile Include="PE\DataDirectory.cs" />
+    <Compile Include="PE\FileHeader.cs" />
+    <Compile Include="PE\INTHeader.cs" />
+    <Compile Include="PE\Machine.cs" />
+    <Compile Include="PE\NTHeader.cs" />
+    <Compile Include="PE\NTHeaderBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SymbolHandler.cs" />
     <Compile Include="SymbolHandlingException.cs" />
+    <Compile Include="SymbolServer.cs" />
     <Compile Include="SymbolStore.cs" />
   </ItemGroup>
   <ItemGroup>
