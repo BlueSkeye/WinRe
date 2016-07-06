@@ -2,12 +2,24 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using SymMngr;
+using SymMngr.Natives;
 
 namespace SymMngrTest
 {
     [TestClass]
     public class SymbolHandlerTest
     {
+        [TestMethod]
+        public void FindNtDllFile()
+        {
+            throw new NotImplementedException();
+            //using (SymbolHandler handler = new SymbolHandler()) {
+            //    string fullPath = handler.FindExeFile("NTDLL.DLL");
+            //    int i = 1;
+            //}
+            //return;
+        }
+
         [TestMethod]
         public void InitAndClose()
         {
@@ -29,14 +41,34 @@ namespace SymMngrTest
         [TestMethod]
         public void TestSearchPath()
         {
-            string searchPath;
-            using (SymbolHandler handler = new SymbolHandler()) {
-                searchPath = handler.SearchPath;
+            IntPtr dllLibraryCookie = IntPtr.Zero;
+
+            try {
+                AppDomain currentDomain = AppDomain.CurrentDomain;
+                dllLibraryCookie = Kernel32.AddDllDirectory(currentDomain.BaseDirectory);
+                IntPtr nativeDbgHelp = Kernel32.LoadLibraryEx("DBGHELP.DLL", IntPtr.Zero,
+                    Kernel32.LoadFlags.SeachUserDirectories);
+                if (IntPtr.Zero == nativeDbgHelp) {
+                    throw new ApplicationException();
+                }
+                IntPtr nativeSymSrv = Kernel32.LoadLibraryEx("SYMSRV.DLL", IntPtr.Zero,
+                    Kernel32.LoadFlags.SeachUserDirectories);
+                if (IntPtr.Zero == nativeSymSrv) {
+                    throw new ApplicationException();
+                }
+                string searchPath;
+                using (SymbolHandler handler = new SymbolHandler()) {
+                    handler.SearchPath =
+                        @"srv*c:\symbols*https://msdl.microsoft.com/download/symbols";
+                    searchPath = handler.FindExeFile("alg.exe", 0x5632D7B5, 0x1c000);
+                }
+                return;
             }
-            using (SymbolHandler handler = new SymbolHandler()) {
-                handler.SearchPath = searchPath;
+            finally {
+                if (null != dllLibraryCookie) {
+                    Kernel32.RemoveDllDirectory(dllLibraryCookie);
+                }
             }
-            return;
         }
     }
 }

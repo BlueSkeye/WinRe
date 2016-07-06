@@ -3,34 +3,29 @@ using System.Runtime.InteropServices;
 
 namespace SymMngr.PE
 {
-    [Serializable()]
-    [StructLayout(LayoutKind.Explicit)]
     public class FileHeader
     {
-        internal FileHeader()
+        internal FileHeader(IntPtr at)
         {
+            // Skip magic signature.
+            int offset = MachineFileOffset;
+            Machine = (Machine)ImageHelpers.ReadUint16(at, ref offset);
+            SectionsCount = ImageHelpers.ReadUint16(at, ref offset);
+            Timestamp = Constants.Epoch + TimeSpan.FromSeconds(ImageHelpers.ReadUint32(at, ref offset));
+            _symbolTablePointer = ImageHelpers.ReadUint32(at, ref offset);
+            _symbolsCount = ImageHelpers.ReadUint32(at, ref offset);
+            _optionalHeaderSize = ImageHelpers.ReadUint32(at, ref offset);
+            Characteristics = (Characteristics)ImageHelpers.ReadUint16(at, ref offset);
             return;
         }
 
-        public Characteristics Characteristics
-        {
-            get { return _characteristics; }
-        }
+        public Characteristics Characteristics { get; private set; }
 
-        public Machine Machine
-        {
-            get { return _machine; }
-        }
+        public Machine Machine { get; private set; }
 
-        internal ushort SectionsCount
-        {
-            get { return _sectionsCount; }
-        }
+        internal ushort SectionsCount { get; private set; }
 
-        internal DateTime Timestamp
-        {
-            get { return Constants.Epoch + TimeSpan.FromSeconds(_timestamp); }
-        }
+        internal DateTime Timestamp { get; private set; }
 
         internal static Machine LookupMachineKind(IntPtr fileHeaderAt)
         {
@@ -38,20 +33,8 @@ namespace SymMngr.PE
         }
 
         private const int MachineFileOffset = 0x04;
-        // FILE HEADER
-        [FieldOffset(MachineFileOffset)]
-        private Machine _machine;
-        [FieldOffset(0x06)]
-        private ushort _sectionsCount;
-        [FieldOffset(0x08)]
-        private uint _timestamp;
-        [FieldOffset(0x0C)]
         private uint _symbolTablePointer;
-        [FieldOffset(0x10)]
         private uint _symbolsCount;
-        [FieldOffset(0x14)]
         private uint _optionalHeaderSize;
-        [FieldOffset(0x16)]
-        private Characteristics _characteristics;
     }
 }

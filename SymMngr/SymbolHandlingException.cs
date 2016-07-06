@@ -8,5 +8,11 @@ namespace SymMngr
         {
             return;
         }
+
+        internal SymbolHandlingException(string message)
+            : base(message)
+        {
+            return;
+        }
     }
 }

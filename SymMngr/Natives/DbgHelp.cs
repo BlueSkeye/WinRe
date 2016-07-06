@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace SymMngr.Natives
 {
@@ -38,6 +37,21 @@ namespace SymMngr.Natives
         [DllImport(DllName, CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
         internal static extern bool SymCleanup(
             [In] IntPtr hProcess);
+
+        internal delegate bool SymFindFileInPathProcDelegate(string filename, IntPtr context);
+
+        [DllImport(DllName, CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
+        internal static extern bool SymFindFileInPath(
+            [In] IntPtr hProcess,
+            [In] string SearchPath,
+            [In] string FileName,
+            [In] IntPtr id,
+            [In] uint two,
+            [In] uint three,
+            [In] uint flags,
+            [In] IntPtr FilePath,
+            [In] SymFindFileInPathProcDelegate callback,
+            [In] IntPtr context);
 
         [DllImport(DllName, CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
         internal static extern IntPtr SymGetHomeDirectory(

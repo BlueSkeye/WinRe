@@ -11,3 +11,6 @@ https://msdn.microsoft.com/en-us/library/windows/desktop/ms681417(v=vs.85).aspx
 https://jpassing.com/2008/06/10/explicit-symbol-loading-with-dbghelp/
 [4] How do you use SymLoadModuleEx to load a PDB file?
 http://stackoverflow.com/questions/4867159/how-do-you-use-symloadmoduleex-to-load-a-pdb-file
+[5] Symbols the Microsoft Way
+https://randomascii.wordpress.com/2013/03/09/symbols-the-microsoft-way/
+

@@ -4,22 +4,28 @@ using System.Runtime.InteropServices;
 
 namespace SymMngr.PE
 {
-    /// <remarks>The StructLayout attribute is mandatory, otherwise this would
-    /// trigger an invalid format exxception.</remarks>
-    [Serializable()]
-    [StructLayout(LayoutKind.Explicit)]
     public abstract class NTHeaderBase : FileHeader
     {
-        internal NTHeaderBase(IntPtr native)
+        internal NTHeaderBase(IntPtr at)
+            : base(at)
         {
-            if (IntPtr.Zero == native) { throw new ArgumentNullException(); }
-            if (Magic != Marshal.ReadInt32(native)) {
+            if (IntPtr.Zero == at) { throw new ArgumentNullException(); }
+            if (Magic != Marshal.ReadInt32(at)) {
                 throw new ArgumentException();
             }
-            ExtractDataDirectories(native);
+            ExtractDataDirectories(at);
         }
 
-        internal abstract List<DataDirectory> DataDirectories { get; }
+        internal List<DataDirectory> DataDirectories
+        {
+            get
+            {
+                if (null == _dataDirectories) {
+                    _dataDirectories = new List<DataDirectory>();
+                }
+                return _dataDirectories;
+            }
+        }
 
         protected abstract int DataDirectoryOffset { get; }
 
@@ -30,18 +36,18 @@ namespace SymMngr.PE
             }
         }
 
-        protected void ExtractDataDirectories(IntPtr native)
+        protected void ExtractDataDirectories(IntPtr headerAt)
         {
-            int dataDirectorySize = Marshal.SizeOf(typeof(DataDirectory));
+            int dataDirectorySize = DataDirectory.NativeSize;
+            int offset = DataDirectoryOffset;
             for (int index = 0; index < DirectoryEntriesCount; index++) {
-                DataDirectory newDirectory = new DataDirectory((DataDirectoryKind)index);
-                DataDirectories.Add(
-                    Marshal.PtrToStructure<DataDirectory>(
-                        native + DataDirectoryOffset + (index * dataDirectorySize)));
+                DataDirectories.Add(new DataDirectory((DataDirectoryKind)index, headerAt, ref offset));
             }
+            return;
         }
 
         private const int DirectoryEntriesCount = 16;
         private const uint Magic = 0x4550;
+        private List<DataDirectory> _dataDirectories;
     }
 }

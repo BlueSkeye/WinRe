@@ -18,6 +18,7 @@ namespace SymMngr
             return;
         }
 
+        #region PROPERTIES
         public override bool IsInvalid
         {
             get { return (IntPtr.Zero == base.handle); }
@@ -47,7 +48,8 @@ namespace SymMngr
             {
                 lock (Globals.DebugHelpLock) {
                     if (!Natives.DbgHelp.SymSetSearchPath(base.handle, value)) {
-                        throw new SymbolHandlingException();
+                        throw new SymbolHandlingException(string.Format("Error : 0x{0:X8}",
+                            Marshal.GetLastWin32Error()));
                     }
                 }
             }
@@ -63,6 +65,41 @@ namespace SymMngr
         {
             get { return GetHomeDirectory(DbgHelp.DirectoryType.Symbols); }
             set { SetHomeDirectory(DbgHelp.DirectoryType.Symbols, value); }
+        }
+        #endregion
+
+        #region METHODS
+        internal string FindExeFile(string exeFilename, uint datestamp, uint size)
+        {
+            Option oldOptions = this.Options;
+            IntPtr nativePathBuffer = IntPtr.Zero;
+            try {
+                nativePathBuffer = Marshal.AllocCoTaskMem(
+                    sizeof(char) * (Constants.MaxPath + 1));
+                this.Options = oldOptions | Option.Debug;
+                //IntPtr pDatestamp = IntPtr.Zero;
+                try {
+                    //pDatestamp = Marshal.AllocCoTaskMem(sizeof(uint));
+                    //Marshal.WriteInt32(pDatestamp, (int)datestamp);
+                    if (!DbgHelp.SymFindFileInPath(base.handle, null, exeFilename,
+                        new IntPtr(datestamp), size, 0, 2, nativePathBuffer, null, IntPtr.Zero))
+                    {
+                        int lastError = Marshal.GetLastWin32Error();
+                        throw new SymbolHandlingException(string.Format("Error : 0x{0:X8}", lastError));
+                    }
+                }
+                finally {
+                    // if (IntPtr.Zero != pDatestamp) { Marshal.FreeCoTaskMem(pDatestamp); }
+                }
+                string result = Marshal.PtrToStringUni(nativePathBuffer);
+                return result;
+            }
+            finally {
+                this.Options = oldOptions;
+                if (IntPtr.Zero != nativePathBuffer) {
+                    Marshal.FreeCoTaskMem(nativePathBuffer);
+                }
+            }
         }
 
         private string GetHomeDirectory(DbgHelp.DirectoryType kind)
@@ -114,14 +151,13 @@ namespace SymMngr
             }
             base.SetHandle(new IntPtr(thisHandleValue));
             string searchPath = (null == searchPathBuilder) ? null : searchPathBuilder.ToString();
-            bool success = DbgHelp.SymInitialize(base.handle, searchPath, false);
-            if (success) {
-                return;
+            if (!DbgHelp.SymInitialize(base.handle, searchPath, false)) {
+                Trace.TraceError(
+                    "Failed to create symbol handler for path '{0}'. Error : 0x{1:X8}",
+                    searchPath ?? "<NULL>", Marshal.GetLastWin32Error());
+                throw new SymbolHandlingException();
             }
-            Trace.TraceError(
-                "Failed to create symbol handler for path '{0}'. Error : 0x{1:X8}",
-                searchPath ?? "<NULL>", Marshal.GetLastWin32Error());
-            throw new SymbolHandlingException();
+            // TODO : Also attempt to check the DBGHELP.DLL version.
         }
 
         public void LoadModule(string imageName, string moduleName, ulong at, uint size)
@@ -155,6 +191,7 @@ namespace SymMngr
                 }
             }
         }
+        #endregion
 
         private static int _lastAllocatedHandle = 1;
 

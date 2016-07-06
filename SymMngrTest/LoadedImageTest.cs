@@ -36,8 +36,9 @@ namespace SymMngrTest
         [TestMethod]
         public void TestNtDll()
         {
+            INTHeader ntHeader;
             using (LoadedImage image = new LoadedImage(NtDllPath)) {
-                INTHeader ntHeader = image.NTHeader; 
+                ntHeader = image.NTHeader; 
             }
             return;
         }

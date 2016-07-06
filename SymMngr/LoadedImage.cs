@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
 
 using SymMngr.PE;
+using SymMngr.Natives;
 
 namespace SymMngr
 {
@@ -15,9 +14,10 @@ namespace SymMngr
             if (null == from) { throw new ArgumentNullException(); }
             if (!from.Exists) { throw new ArgumentException(); }
             try {
-                _file = File.Open(from.FullName, FileMode.Open, FileAccess.Read);
-                _mappedFile = MemoryMappedFile.CreateFromFile(_file, Guid.NewGuid().ToString(),
-                    0, MemoryMappedFileAccess.Read, null, HandleInheritability.None, false);
+                _imageBase = Kernel32.LoadLibraryEx(from.FullName, IntPtr.Zero,
+                    Kernel32.LoadFlags.DontResolveDllReferences
+                    | Kernel32.LoadFlags.IgnoreCodeAuthorizationLevel
+                    | Kernel32.LoadFlags.LoadLibraryAsImageResources);
             }
             catch {
                 Dispose(true);
@@ -39,11 +39,9 @@ namespace SymMngr
                     switch (FileHeader.LookupMachineKind(nativeHeader)) {
                         case Machine.I386:
                             _ntHeader = new NTHeader32(nativeHeader);
-                            Marshal.PtrToStructure<NTHeader32>(nativeHeader, (NTHeader32)_ntHeader);
                             break;
                         case Machine.X64:
                             _ntHeader = new NTHeader64(nativeHeader);
-                            Marshal.PtrToStructure<NTHeader64>(nativeHeader, (NTHeader64)_ntHeader);
                             break;
                         default:
                             throw new NotSupportedException();
@@ -59,8 +57,7 @@ namespace SymMngr
             {
                 lock (Globals.DebugHelpLock) {
                     return Constants.Epoch +
-                        TimeSpan.FromSeconds(Natives.DbgHelp.GetTimestampForLoadedLibrary(
-                            _mappedFile.SafeMemoryMappedFileHandle.DangerousGetHandle()));
+                        TimeSpan.FromSeconds(Natives.DbgHelp.GetTimestampForLoadedLibrary(_imageBase));
                 }
             }
         }
@@ -73,19 +70,13 @@ namespace SymMngr
         protected virtual void Dispose(bool disposing)
         {
             if (disposing) { GC.SuppressFinalize(this); }
-            if (null != _mappedFile) {
-                _mappedFile.Dispose();
-                _mappedFile = null;
-            }
-            if (null != _file) {
-                _file.Close();
-                _file = null;
+            if (IntPtr.Zero != _imageBase) {
+                Kernel32.FreeLibrary(_imageBase);
+                _imageBase = IntPtr.Zero;
             }
         }
 
-        private FileStream _file;
         private IntPtr _imageBase;
-        private MemoryMappedFile _mappedFile;
         private INTHeader _ntHeader;
     }
 }
