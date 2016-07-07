@@ -32,7 +32,7 @@ namespace SymMngr.Natives
             [In] IntPtr /* PIMAGE_NT_HEADERS */ NtHeaders,
             [In] IntPtr Base,
             [In] uint Rva,
-            [In] IntPtr /* PIMAGE_SECTION_HEADER */ LastRvaSection);
+            [In, Out] ref IntPtr /* PIMAGE_SECTION_HEADER */ LastRvaSection);
 
         [DllImport(DllName, CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
         internal static extern bool SymCleanup(
@@ -46,6 +46,18 @@ namespace SymMngr.Natives
             [In] string SearchPath,
             [In] string FileName,
             [In] IntPtr id,
+            [In] uint two,
+            [In] uint three,
+            [In] uint flags,
+            [In] IntPtr FilePath,
+            [In] SymFindFileInPathProcDelegate callback,
+            [In] IntPtr context);
+        [DllImport(DllName, CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
+        internal static extern bool SymFindFileInPath(
+            [In] IntPtr hProcess,
+            [In] string SearchPath,
+            [In] string FileName,
+            [In] Guid id,
             [In] uint two,
             [In] uint three,
             [In] uint flags,

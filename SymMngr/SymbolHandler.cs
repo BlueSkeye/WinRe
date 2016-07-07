@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
+using SymMngr.Api;
 using SymMngr.Natives;
+using SymMngr.PE;
 
 namespace SymMngr
 {
@@ -69,7 +71,7 @@ namespace SymMngr
         #endregion
 
         #region METHODS
-        internal string FindExeFile(string exeFilename, uint datestamp, uint size)
+        private string FindFile(FindFileDelegate finder)
         {
             Option oldOptions = this.Options;
             IntPtr nativePathBuffer = IntPtr.Zero;
@@ -77,22 +79,11 @@ namespace SymMngr
                 nativePathBuffer = Marshal.AllocCoTaskMem(
                     sizeof(char) * (Constants.MaxPath + 1));
                 this.Options = oldOptions | Option.Debug;
-                //IntPtr pDatestamp = IntPtr.Zero;
-                try {
-                    //pDatestamp = Marshal.AllocCoTaskMem(sizeof(uint));
-                    //Marshal.WriteInt32(pDatestamp, (int)datestamp);
-                    if (!DbgHelp.SymFindFileInPath(base.handle, null, exeFilename,
-                        new IntPtr(datestamp), size, 0, 2, nativePathBuffer, null, IntPtr.Zero))
-                    {
-                        int lastError = Marshal.GetLastWin32Error();
-                        throw new SymbolHandlingException(string.Format("Error : 0x{0:X8}", lastError));
-                    }
+                if (!finder(nativePathBuffer)) {
+                    int lastError = Marshal.GetLastWin32Error();
+                    throw new SymbolHandlingException(string.Format("Error : 0x{0:X8}", lastError));
                 }
-                finally {
-                    // if (IntPtr.Zero != pDatestamp) { Marshal.FreeCoTaskMem(pDatestamp); }
-                }
-                string result = Marshal.PtrToStringUni(nativePathBuffer);
-                return result;
+                return Marshal.PtrToStringUni(nativePathBuffer);
             }
             finally {
                 this.Options = oldOptions;
@@ -102,11 +93,67 @@ namespace SymMngr
             }
         }
 
+        /// <summary>Find a .exe, .dbg or other standard file.</summary>
+        /// <param name="exeFilename">Name of searched file</param>
+        /// <param name="datestamp"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        internal string FindExeFile(string exeFilename, uint datestamp, uint size)
+        {
+            return FindFile(delegate(IntPtr nativePathBuffer) {
+                return DbgHelp.SymFindFileInPath(base.handle, null, exeFilename,
+                    new IntPtr(datestamp), size, 0, 2, nativePathBuffer, null, IntPtr.Zero);
+                });
+        }
+
+        internal string FindPdbFile(string pdbFilename, Guid id, uint age)
+        {
+            return FindFile(delegate (IntPtr nativePathBuffer) {
+                return DbgHelp.SymFindFileInPath(base.handle, null, pdbFilename,
+                    id, age, 0, 8, nativePathBuffer, null, IntPtr.Zero);
+                });
+        }
+
         private string GetHomeDirectory(DbgHelp.DirectoryType kind)
         {
             return GetStringProperty(delegate (IntPtr at, int bufferLength) {
                 return (IntPtr.Zero != DbgHelp.SymGetHomeDirectory(kind, at, bufferLength));
             });
+        }
+
+        /// <summary>Extract PDB file identity from the given exe file.</summary>
+        /// <param name="exeFile"></param>
+        /// <returns>The PDB file name or a null reference if no PDB related information
+        /// has been found in the exe file.</returns>
+        public static string GetPdbFileInfoFromExe(FileInfo exeFile, out Guid id, out uint age)
+        {
+            if (null == exeFile) { throw new ArgumentNullException(); }
+            if (!exeFile.Exists) { throw new FileNotFoundException(); }
+            using (LoadedImage exeModule = new LoadedImage(exeFile)) {
+                IDataDirectory debugDataDirectory = exeModule.NTHeader[DataDirectoryKind.DebuggingInformation];
+                if (null != debugDataDirectory) {
+                    IntPtr nativeDebugData = exeModule.MapRva(debugDataDirectory.RelativeVirtualAddress);
+                    int debugDataDirectoryOffset = 0;
+                    while (debugDataDirectoryOffset < debugDataDirectory.Size) {
+                        IDebugDirectory candidate = new DebugDirectory(nativeDebugData,
+                            ref debugDataDirectoryOffset);
+                        if (DebugInformationType.Codeview != candidate.Type) { continue; }
+                        // Based on undocumented CV_INFO_PDB70 structure.
+                        IntPtr cvRawData = exeModule.MapRva(candidate.AddressOfRawData);
+                        int rawDataOffset = 0;
+                        uint cvSignature = ImageHelpers.ReadUint32(cvRawData, ref rawDataOffset);
+                        if (Constants.RSDSSignature != cvSignature) { continue; }
+                        id = new Guid(ImageHelpers.ReadBytes(cvRawData, 16, ref rawDataOffset));
+                        age = ImageHelpers.ReadUint32(cvRawData, ref rawDataOffset);
+                        return Marshal.PtrToStringAnsi(cvRawData + rawDataOffset);
+                        // CV_INFO_PDB70, *PCV_INFO_PDB70;                    }
+                    }
+                }
+                // Not found. Return default values.
+                id = Guid.Empty;
+                age = 0;
+                return null;
+            }
         }
 
         private string GetStringProperty(GetStringPropertyDelegate getter)
@@ -157,6 +204,10 @@ namespace SymMngr
                     searchPath ?? "<NULL>", Marshal.GetLastWin32Error());
                 throw new SymbolHandlingException();
             }
+            // Set default, reasonable search path.
+            this.SearchPath = string.Format(
+                @"srv*{0}\symbols*https://msdl.microsoft.com/download/symbols",
+                Environment.GetEnvironmentVariable("SystemDrive") ?? "C:");
             // TODO : Also attempt to check the DBGHELP.DLL version.
         }
 
@@ -195,6 +246,7 @@ namespace SymMngr
 
         private static int _lastAllocatedHandle = 1;
 
+        private delegate bool FindFileDelegate(IntPtr nativePathBuffer);
         private delegate bool GetStringPropertyDelegate(IntPtr at, int bufferLength);
 
         private class LoadedModule

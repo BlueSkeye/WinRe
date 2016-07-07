@@ -1,5 +1,5 @@
 ﻿
-namespace SymMngr.PE
+namespace SymMngr
 {
     public enum Machine : ushort
     {

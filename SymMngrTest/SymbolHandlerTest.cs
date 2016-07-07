@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using SymMngr;
@@ -56,11 +57,20 @@ namespace SymMngrTest
                 if (IntPtr.Zero == nativeSymSrv) {
                     throw new ApplicationException();
                 }
-                string searchPath;
+                string algExeSearchPath;
+                string algPdbSearchPath;
                 using (SymbolHandler handler = new SymbolHandler()) {
                     handler.SearchPath =
                         @"srv*c:\symbols*https://msdl.microsoft.com/download/symbols";
-                    searchPath = handler.FindExeFile("alg.exe", 0x5632D7B5, 0x1c000);
+                    algExeSearchPath = handler.FindExeFile("alg.exe", 0x5632D7B5, 0x1c000);
+                    Guid pdbGuid;
+                    uint age;
+                    string pdbFileName = SymbolHandler.GetPdbFileInfoFromExe(
+                        new FileInfo(algExeSearchPath), out pdbGuid, out age);
+                    if (null == pdbFileName) {
+                        throw new ApplicationException();
+                    }
+                    algPdbSearchPath = handler.FindPdbFile(pdbFileName, pdbGuid, age);
                 }
                 return;
             }

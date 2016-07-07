@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
+using SymMngr.Api;
+
 namespace SymMngr.PE
 {
     public abstract class NTHeaderBase : FileHeader
@@ -14,6 +16,17 @@ namespace SymMngr.PE
                 throw new ArgumentException();
             }
             ExtractDataDirectories(at);
+        }
+
+        public IDataDirectory this[DataDirectoryKind kind]
+        {
+            get
+            {
+                int index = (int)kind;
+                if (0 > index) { throw new ArgumentOutOfRangeException(); }
+                if (this.NumberOfRvaAndSize <= index) { return null; }
+                return _dataDirectories[index];
+            }
         }
 
         internal List<DataDirectory> DataDirectories
@@ -38,13 +51,14 @@ namespace SymMngr.PE
 
         protected void ExtractDataDirectories(IntPtr headerAt)
         {
-            int dataDirectorySize = DataDirectory.NativeSize;
             int offset = DataDirectoryOffset;
             for (int index = 0; index < DirectoryEntriesCount; index++) {
                 DataDirectories.Add(new DataDirectory((DataDirectoryKind)index, headerAt, ref offset));
             }
             return;
         }
+
+        public abstract uint NumberOfRvaAndSize { get; }
 
         private const int DirectoryEntriesCount = 16;
         private const uint Magic = 0x4550;
