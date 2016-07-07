@@ -53,6 +53,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\DataDirectoryKind.cs" />
+    <Compile Include="Api\DebugInformationType.cs" />
+    <Compile Include="Api\IDataDirectory.cs" />
+    <Compile Include="Api\IDebugDirectory.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="ImageHelpers.cs" />
@@ -61,9 +65,10 @@
     <Compile Include="Natives\Kernel32.cs" />
     <Compile Include="PE\Characteristics.cs" />
     <Compile Include="PE\DataDirectory.cs" />
+    <Compile Include="PE\DebugDirectory.cs" />
     <Compile Include="PE\FileHeader.cs" />
-    <Compile Include="PE\INTHeader.cs" />
-    <Compile Include="PE\Machine.cs" />
+    <Compile Include="Api\INTHeader.cs" />
+    <Compile Include="Machine.cs" />
     <Compile Include="PE\NTHeader.cs" />
     <Compile Include="PE\NTHeaderBase.cs" />
     <Compile Include="PE\SectionHeader.cs" />

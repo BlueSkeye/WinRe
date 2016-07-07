@@ -16,6 +16,15 @@ namespace SymMngr
             return;
         }
 
+        internal static byte[] ReadBytes(IntPtr at, int length, ref int offset)
+        {
+            byte[] result = new byte[length];
+
+            Marshal.Copy(at + offset, result, 0, result.Length);
+            offset += length;
+            return result;
+        }
+
         internal static byte ReadByte(IntPtr at, ref int offset)
         {
             try {

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
+
+using SymMngr.Api;
 
 namespace SymMngr.PE
 {
@@ -41,7 +41,7 @@ namespace SymMngr.PE
             _sizeOfHeapReserve = ImageHelpers.ReadUint32(at, ref offset);
             _sizeOfHeapCommit = ImageHelpers.ReadUint32(at, ref offset);
             _loaderFlags = ImageHelpers.ReadUint32(at, ref offset);
-            _numberOfRvaAndSizes = ImageHelpers.ReadUint32(at, ref offset);
+            _numberOfRvaAndSize = ImageHelpers.ReadUint32(at, ref offset);
             return;
         }
 
@@ -51,6 +51,11 @@ namespace SymMngr.PE
         }
 
         internal ushort Magic { get; private set; }
+
+        public override uint NumberOfRvaAndSize
+        { 
+            get { return _numberOfRvaAndSize; }
+        }
 
         // OPTIONAL HEADER
         private ushort _magic;
@@ -82,7 +87,7 @@ namespace SymMngr.PE
         private uint _sizeOfHeapReserve;
         private uint _sizeOfHeapCommit;
         private uint _loaderFlags;
-        private uint _numberOfRvaAndSizes;
+        private uint _numberOfRvaAndSize;
     }
 
     public class NTHeader64 : NTHeaderBase, INTHeader
@@ -122,13 +127,18 @@ namespace SymMngr.PE
             _sizeOfHeapReserve = ImageHelpers.ReadUint64(at, ref offset);
             _sizeOfHeapCommit = ImageHelpers.ReadUint64(at, ref offset);
             _loaderFlags = ImageHelpers.ReadUint32(at, ref offset);
-            _numberOfRvaAndSizes = ImageHelpers.ReadUint32(at, ref offset);
+            _numberOfRvaAndSize = ImageHelpers.ReadUint32(at, ref offset);
             return;
         }
 
         protected override int DataDirectoryOffset
         {
             get { return 0x88; }
+        }
+
+        public override uint NumberOfRvaAndSize
+        {
+            get { return _numberOfRvaAndSize; }
         }
 
         // OPTIONAL HEADER
@@ -161,6 +171,6 @@ namespace SymMngr.PE
         private ulong _sizeOfHeapReserve;
         private ulong _sizeOfHeapCommit;
         private uint _loaderFlags;
-        private uint _numberOfRvaAndSizes;
+        private uint _numberOfRvaAndSize;
     }
 }
