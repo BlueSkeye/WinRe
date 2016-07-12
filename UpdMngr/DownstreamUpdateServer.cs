@@ -5,17 +5,17 @@ using DSS = UpdMngr.WebServices.DSSAuthorization;
 using UpdMngr.WebServices.ServerSync;
 using SSWS = UpdMngr.WebServices.ServerSync;
 
+using UpdMngr.Api;
+
 namespace UpdMngr
 {
     public class DownstreamUpdateServer : UpdateServer, IDisposable
     {
-        public delegate IServerIdentity ServerIdentityProviderDelegate();
-
-        public DownstreamUpdateServer(ServerIdentityProviderDelegate serverIdentityManager,
+        public DownstreamUpdateServer(IPersistenceProvider persistenceProvider,
             string upstreamServerName = Constants.MicrosoftServerName)
         {
-            if (null == serverIdentityManager) { throw new ArgumentNullException(); }
-            _serverIdentityProvider = serverIdentityManager;
+            if (null == persistenceProvider) { throw new ArgumentNullException(); }
+            _serverIdentityProvider = persistenceProvider;
             _upstreamServerName = upstreamServerName;
             AcquireCookie();
             return;
@@ -36,7 +36,7 @@ namespace UpdMngr
                 if (null == targetPlugin) {
                     throw new UpdateManagerException("No known authentication plugin.");
                 }
-                IServerIdentity serverIdentity = _serverIdentityProvider();
+                IServerIdentity serverIdentity = _serverIdentityProvider.GetServerIdentity();
                 IReadOnlyAuthorizationCookie authCookie = serverIdentity.AuthorizationCookie;
                 using (DssAuthWebService remoteAuthenticator =
                     new DssAuthWebService(_upstreamServerName, ServerSyncWebService.VersionPrefix, targetPlugin.ServiceUrl))
@@ -122,8 +122,21 @@ namespace UpdMngr
             if (disposing) { GC.SuppressFinalize(this); }
         }
 
+        internal void RetrieveUpstreamConfigurationData(string lastConfigAnchor)
+        {
+            if (null == _cookie) {
+                throw new InvalidOperationException();
+            }
+            using (ServerSyncWebService remote = new ServerSyncWebService(_upstreamServerName)) {
+                // TODO : Should attempt with retry in case cookie has expired.
+                ServerSyncConfigData configData = remote.GetConfigData(_cookie, lastConfigAnchor);
+
+                int i = 1;
+            }
+        }
+
         private SSWS.Cookie _cookie;
-        private ServerIdentityProviderDelegate _serverIdentityProvider;
+        private IPersistenceProvider _serverIdentityProvider;
         private string _upstreamServerName;
     }
 }

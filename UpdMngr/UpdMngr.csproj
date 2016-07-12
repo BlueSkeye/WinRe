@@ -38,11 +38,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\IPersistenceProvider.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Data\ServerIdentity.cs" />
+    <Compile Include="Data\XmlBasedPersistenceProvider.cs" />
     <Compile Include="DownstreamUpdateServer.cs" />
-    <Compile Include="IReadOnlyAuthorizationCookie.cs" />
-    <Compile Include="IReadOnlyCookie.cs" />
-    <Compile Include="IServerIdentity.cs" />
+    <Compile Include="Api\IReadOnlyAuthorizationCookie.cs" />
+    <Compile Include="Api\IReadOnlyCookie.cs" />
+    <Compile Include="Api\IServerIdentity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UpdateManagerException.cs" />
     <Compile Include="UpdateServer.cs" />
@@ -64,6 +67,7 @@
     </None>
     <None Include="Wsdl\ServerSync.wsdl" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

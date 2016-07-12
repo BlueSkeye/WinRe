@@ -1,5 +1,5 @@
 ﻿
-namespace UpdMngr
+namespace UpdMngr.Api
 {
     public interface IReadOnlyAuthorizationCookie
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UpdMngr
+namespace UpdMngr.Api
 {
     public interface IReadOnlyCookie
     {
