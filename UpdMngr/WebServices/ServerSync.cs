@@ -371,5 +371,24 @@ namespace UpdMngr.WebServices.ServerSync
         [XmlElement(DataType = "base64Binary")]
         public byte[] CookieData { get; set; }
     }
+
+    public enum ErrorCode
+    {
+        InvalidCookie,
+        ConfigChanged,
+        RegistrationRequired,
+        ServerChanged,
+        InternalServerError,
+        CookieExpired,
+        InvalidParameters,
+        InvalidAuthorizationCookie,
+        RegistrationNotRequired,
+        RedirectorLocationChanged,
+        ServerBusy,
+        FileLocationChanged,
+        DeploymentSynchronizationNotAllowed,
+        IncompatibleProtocolVersion,
+        FileDigestsMissing
+    }
 #pragma warning restore 1591
 }

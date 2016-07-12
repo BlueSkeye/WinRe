@@ -7,6 +7,7 @@ namespace UpdMngr.WebServices
     public abstract class BaseUpdateWebService
         : SoapHttpClientProtocol
     {
+        public delegate bool SoapExceptionHandlerDelegate<T>(FaultDetails<T> details);
         public delegate X WSInvokeDelegate<X>();
 
         public BaseUpdateWebService(string serverName, string versionPrefix, string relativeUrl)
@@ -48,12 +49,29 @@ namespace UpdMngr.WebServices
             set { throw new NotSupportedException(); }
         }
 
-        public T AttemptWithRetry<T>(WSInvokeDelegate<T> handler)
+        /// <summary></summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="E"></typeparam>
+        /// <param name="handler"></param>
+        /// <param name="defaultError"></param>
+        /// <param name="errorHandler"></param>
+        /// <returns></returns>
+        /// <remarks>Parameters order is important because we want the defaultError
+        /// to be provided whenever an errorHandler is. This is far to be bullet proof
+        /// due to "named arguments" syntax. We intend this as a hint only.</remarks>
+        public T AttemptWithRetry<T,E>(WSInvokeDelegate<T> handler,
+            E defaultError = default(E), SoapExceptionHandlerDelegate<E> errorHandler = null)
         {
             _retryCount = 0;
             while (true) {
                 try { return handler(); }
                 catch (Exception e) {
+                    if (null != errorHandler) {
+                        SoapException soap = e as SoapException;
+                        if (errorHandler(FaultDetails<E>.Create(soap, defaultError))) {
+                            continue;
+                        }
+                    }
                     if (!this.IsExceptionRecoverable(e)) { throw; }
                 }
             }

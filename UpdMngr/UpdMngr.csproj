@@ -52,6 +52,7 @@
     <Compile Include="WebServices\DSSAuthorization.cs">
       <SubType>code</SubType>
     </Compile>
+    <Compile Include="WebServices\FaultDetails.cs" />
     <Compile Include="WebServices\ServerSync.cs" />
   </ItemGroup>
   <ItemGroup>

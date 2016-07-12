@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Net;
+using UpdMngr.WebServices;
 using UpdMngr.WebServices.DSSAuthorization;
 using DSS = UpdMngr.WebServices.DSSAuthorization;
 using UpdMngr.WebServices.ServerSync;
@@ -25,7 +25,8 @@ namespace UpdMngr
         {
             AuthPlugInInfo targetPlugin = null;
             using (ServerSyncWebService remote = new ServerSyncWebService(_upstreamServerName)) {
-                ServerAuthConfig configuration = remote.AttemptWithRetry(remote.GetAuthConfig);
+                ServerAuthConfig configuration =
+                    remote.AttemptWithRetry<ServerAuthConfig,SSWS.ErrorCode>(remote.GetAuthConfig);
                 foreach (AuthPlugInInfo candidate in configuration.AuthInfo) {
                     // This is the only plugin we support at current time.
                     if ("DssTargeting" != candidate.PlugInID) { continue; }
@@ -43,11 +44,11 @@ namespace UpdMngr
                     // Retrieve a locally stored authorization cookie or acquire it
                     // from the server.
                     if (null == authCookie) {
-                        DSS.AuthorizationCookie newCookie =
+                        DSS.AuthorizationCookie newAuthorizationCookie =
                             remoteAuthenticator.GetAuthorizationCookie(serverIdentity.ServerName,
                             serverIdentity.ServerId, new Guid[0]);
                         serverIdentity.RegisterAuthorizationCookieData(
-                            newCookie.PlugInId, newCookie.CookieData);
+                            newAuthorizationCookie.PlugInId, newAuthorizationCookie.CookieData);
                         authCookie = serverIdentity.AuthorizationCookie;
                     }
                 }
@@ -58,14 +59,50 @@ namespace UpdMngr
                         Expiration = serverIdentity.UpstreamServerCookie.Expiration,
                         EncryptedData = (byte[])serverIdentity.UpstreamServerCookie.EncryptedData.Clone() };
                 }
-                currentCookie = remote.GetCookie(
-                    new SSWS.AuthorizationCookie[] {
+                bool registerAgain = (null == currentCookie);
+                SSWS.Cookie newCookie = remote.AttemptWithRetry(delegate () {
+                    return remote.GetCookie(
+                        new SSWS.AuthorizationCookie[] {
                         new SSWS.AuthorizationCookie() {
                             PlugInId = authCookie.PlugInId,
                             CookieData = (byte[])authCookie.CookieData.Clone() } },
-                        currentCookie, "1.8");
-
-                serverIdentity.RegisterUpstreamCookieData(currentCookie.Expiration, currentCookie.EncryptedData);
+                            currentCookie, "1.8");
+                    },
+                    SSWS.ErrorCode.InternalServerError,
+                    // Be prepared here for clean cookie expiration handling.
+                    delegate (FaultDetails<SSWS.ErrorCode> details) {
+                        switch (details.ErrorCode) {
+                            case ErrorCode.InvalidCookie:
+                                break;
+                            case ErrorCode.ServerChanged:
+                                if (null != currentCookie) { break; }
+                                return false;
+                            default:
+                                return false;
+                        }
+                        currentCookie = null;
+                        registerAgain = true;
+                        return true;
+                    });
+                if ((null != currentCookie) && (null != newCookie) && !registerAgain) {
+                    byte[] currentData = currentCookie.EncryptedData;
+                    int dataLength = currentData.Length;
+                    byte[] newData = newCookie.EncryptedData;
+                    if (dataLength != newData.Length) {
+                        registerAgain = true;
+                    }
+                    else {
+                        for (int index = 0; index < dataLength; index++) {
+                            if (newData[index] != currentData[index]) {
+                                registerAgain = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (registerAgain) {
+                    serverIdentity.RegisterUpstreamCookieData(currentCookie.Expiration, currentCookie.EncryptedData);
+                }
                 _cookie = currentCookie;
             }
         }
