@@ -41,7 +41,8 @@
     <Compile Include="Constants.cs" />
     <Compile Include="DownstreamUpdateServer.cs" />
     <Compile Include="IReadOnlyAuthorizationCookie.cs" />
-    <Compile Include="IServerIdentityManager.cs" />
+    <Compile Include="IReadOnlyCookie.cs" />
+    <Compile Include="IServerIdentity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UpdateManagerException.cs" />
     <Compile Include="UpdateServer.cs" />
