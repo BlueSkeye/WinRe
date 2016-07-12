@@ -39,8 +39,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\IPersistenceProvider.cs" />
+    <Compile Include="Api\IUpstreamServerContext.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Data\BasePersistenceDocument.cs" />
     <Compile Include="Data\ServerIdentity.cs" />
+    <Compile Include="Data\UpstreamServerContext.cs" />
     <Compile Include="Data\XmlBasedPersistenceProvider.cs" />
     <Compile Include="DownstreamUpdateServer.cs" />
     <Compile Include="Api\IReadOnlyAuthorizationCookie.cs" />

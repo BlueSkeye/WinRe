@@ -11,5 +11,7 @@ namespace UpdMngr.Api
     public interface IPersistenceProvider
     {
         IServerIdentity GetServerIdentity(string defaultName = null);
+        IUpstreamServerContext TryGetContext(IServerIdentity owner, string upstreamServerName,
+            bool createIfNotFound = false);
     }
 }

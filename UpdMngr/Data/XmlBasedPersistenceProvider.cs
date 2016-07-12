@@ -33,6 +33,31 @@ namespace UpdMngr.Data
             get { return new FileInfo(Path.Combine(_baseDirectory.FullName, ServerIdFileName)); }
         }
 
+        private DirectoryInfo EnsureStorageDirectory(IServerIdentity owner)
+        {
+            // TODO : Should perform some kind of canonicalization on server name.
+            DirectoryInfo targetDirectory = new DirectoryInfo(
+                Path.Combine(_baseDirectory.FullName, owner.ServerName));
+            if (!targetDirectory.Exists) {
+                targetDirectory.Create();
+                targetDirectory.Refresh();
+            }
+            return targetDirectory;
+        }
+
+        private static XmlSerializer GetSerializer(Type forType)
+        {
+            if (null == _serializerByType) {
+                _serializerByType = new Dictionary<Type, XmlSerializer>();
+            }
+            XmlSerializer result;
+            if (!_serializerByType.TryGetValue(forType, out result)) {
+                result = new XmlSerializer(forType);
+                _serializerByType.Add(forType, result);
+            }
+            return result;
+        }
+
         public IServerIdentity GetServerIdentity(string defaultName = null)
         {
             try {
@@ -40,9 +65,9 @@ namespace UpdMngr.Data
                 try {
                     try { input = File.Open(ServerIdFile.FullName, FileMode.Open, FileAccess.Read); }
                     catch { }
-                    XmlSerializer serializer = new XmlSerializer(typeof(ServerIdentity));
+                    XmlSerializer serializer = GetSerializer(typeof(ServerIdentity));
                     ServerIdentity result = (ServerIdentity)serializer.Deserialize(input);
-                    result.Owner = this;
+                    result.PersistanceHandler = this;
                     return result;
                 }
                 finally { if (null != input) { input.Close(); } }
@@ -52,30 +77,86 @@ namespace UpdMngr.Data
                     throw new InvalidOperationException();
                 }
                 ServerIdentity result = new ServerIdentity() {
-                    Owner = this
+                    PersistanceHandler = this
                 };
                 result.ServerName = defaultName;
                 result.ServerId = Guid.NewGuid().ToString();
-                RewriteIdentity(result);
+                Rewrite(result);
                 return result;
             }
         }
 
-        internal void RewriteIdentity(ServerIdentity newIdentity)
+        private static string GetUpstreamServerContextFileName(DirectoryInfo storeInto,
+            UpstreamServerContext context)
         {
-            FileStream output = null;
-            try {
-                try { output = File.Open(ServerIdFile.FullName, FileMode.Create, FileAccess.Write); }
-                catch { }
-                XmlSerializer serializer = new XmlSerializer(typeof(ServerIdentity));
+            return GetUpstreamServerContextFileName(storeInto, context.ServerName);
+        }
+
+        private static string GetUpstreamServerContextFileName(DirectoryInfo storeInto,
+            string serverName)
+        {
+            // TODO : Should perform some kind of canonicalization on server name.
+            return Path.Combine(storeInto.FullName,
+                string.Format(UpstreamServerContextNamePattern, serverName));
+        }
+
+        internal void Rewrite(ServerIdentity newIdentity)
+        {
+            Rewrite(ServerIdFile.FullName, typeof(ServerIdentity), newIdentity);
+        }
+
+        internal void Rewrite(UpstreamServerContext context)
+        {
+            DirectoryInfo storeInto = EnsureStorageDirectory(context.Owner);
+            // TODO : Consider persisting the context owner server name or
+            // identifier as an attribute for consistency checking.
+            Rewrite(
+                GetUpstreamServerContextFileName(storeInto, context),
+                typeof(UpstreamServerContext), context);
+        }
+
+        internal void Rewrite(string fullFileName, Type serializedType, object item)
+        {
+            using (FileStream output = File.Open(fullFileName, FileMode.Create, FileAccess.Write)) {
+                XmlSerializer serializer = GetSerializer(serializedType);
                 using (StreamWriter writer = new StreamWriter(output)) {
-                    serializer.Serialize(writer, newIdentity);
+                    serializer.Serialize(writer, item);
                 }
             }
-            finally { if (null != output) { output.Close(); } }
+        }
+
+        private T ReadFromStorage<T>(string  fullFileName)
+            where T : BasePersistenceDocument
+        {
+            using (FileStream input = File.Open(fullFileName, FileMode.Open, FileAccess.Read)) {
+                XmlSerializer serializer = GetSerializer(typeof(T));
+                using (StreamReader reader = new StreamReader(input)) {
+                    T result = (T)serializer.Deserialize(reader);
+                    result.PersistanceHandler = this;
+                    return result;
+                }
+            }
+        }
+
+        public IUpstreamServerContext TryGetContext(IServerIdentity owner, string upstreamServerName,
+            bool createIfNotFound)
+        {
+            if (string.IsNullOrEmpty(upstreamServerName)) {
+                throw new ArgumentNullException();
+            }
+            DirectoryInfo storeInto = EnsureStorageDirectory(owner);
+            try {
+                return ReadFromStorage<UpstreamServerContext>(
+                    GetUpstreamServerContextFileName(storeInto, upstreamServerName));
+            }
+            catch {
+                return (createIfNotFound) ? new UpstreamServerContext(this) : null;
+            }
         }
 
         private const string ServerIdFileName = "updsrvid.xml";
+        private const string UpstreamServerContextNamePattern = "USS-{0}.xml";
         private DirectoryInfo _baseDirectory;
+        private static Dictionary<Type, XmlSerializer> _serializerByType;
     }
 }

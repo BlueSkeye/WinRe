@@ -15,7 +15,7 @@ namespace UpdMngr
             string upstreamServerName = Constants.MicrosoftServerName)
         {
             if (null == persistenceProvider) { throw new ArgumentNullException(); }
-            _serverIdentityProvider = persistenceProvider;
+            _persistenceProvider = persistenceProvider;
             _upstreamServerName = upstreamServerName;
             AcquireCookie();
             return;
@@ -36,28 +36,33 @@ namespace UpdMngr
                 if (null == targetPlugin) {
                     throw new UpdateManagerException("No known authentication plugin.");
                 }
-                IServerIdentity serverIdentity = _serverIdentityProvider.GetServerIdentity();
-                IReadOnlyAuthorizationCookie authCookie = serverIdentity.AuthorizationCookie;
-                using (DssAuthWebService remoteAuthenticator =
-                    new DssAuthWebService(_upstreamServerName, ServerSyncWebService.VersionPrefix, targetPlugin.ServiceUrl))
-                {
-                    // Retrieve a locally stored authorization cookie or acquire it
-                    // from the server.
-                    if (null == authCookie) {
+                // TODO : Consider caching this item. This must be done consistently
+                // relatively to rewriting its content to persistence storage.
+                IServerIdentity serverIdentity = _persistenceProvider.GetServerIdentity();
+                IUpstreamServerContext context =
+                    _persistenceProvider.TryGetContext(serverIdentity, _upstreamServerName, true);
+                // context is guaranteed to exist, albeit can be empty.
+                IReadOnlyAuthorizationCookie authCookie = context.AuthorizationCookie;
+                // Retrieve a locally stored authorization cookie or acquire it
+                // from the server.
+                if (null == authCookie) {
+                    using (DssAuthWebService remoteAuthenticator =
+                        new DssAuthWebService(_upstreamServerName, ServerSyncWebService.VersionPrefix, targetPlugin.ServiceUrl))
+                    {
                         DSS.AuthorizationCookie newAuthorizationCookie =
                             remoteAuthenticator.GetAuthorizationCookie(serverIdentity.ServerName,
                             serverIdentity.ServerId, new Guid[0]);
-                        serverIdentity.RegisterAuthorizationCookieData(
+                        context.RegisterAuthorizationCookieData(
                             newAuthorizationCookie.PlugInId, newAuthorizationCookie.CookieData);
-                        authCookie = serverIdentity.AuthorizationCookie;
+                        authCookie = context.AuthorizationCookie;
                     }
                 }
                 // Now we have an authorization cookie. Go on with the cookie.
                 SSWS.Cookie currentCookie = null;
-                if (null != serverIdentity.UpstreamServerCookie) {
+                if (null != context.UpstreamServerCookie) {
                     currentCookie = new SSWS.Cookie() {
-                        Expiration = serverIdentity.UpstreamServerCookie.Expiration,
-                        EncryptedData = (byte[])serverIdentity.UpstreamServerCookie.EncryptedData.Clone() };
+                        Expiration = context.UpstreamServerCookie.Expiration,
+                        EncryptedData = (byte[])context.UpstreamServerCookie.EncryptedData.Clone() };
                 }
                 bool registerAgain = (null == currentCookie);
                 SSWS.Cookie newCookie = remote.AttemptWithRetry(delegate () {
@@ -101,7 +106,7 @@ namespace UpdMngr
                     }
                 }
                 if (registerAgain) {
-                    serverIdentity.RegisterUpstreamCookieData(currentCookie.Expiration, currentCookie.EncryptedData);
+                    context.RegisterUpstreamCookieData(currentCookie.Expiration, currentCookie.EncryptedData);
                 }
                 _cookie = currentCookie;
             }
@@ -127,16 +132,25 @@ namespace UpdMngr
             if (null == _cookie) {
                 throw new InvalidOperationException();
             }
+            IServerIdentity serverIdentity = _persistenceProvider.GetServerIdentity();
+            IUpstreamServerContext context =
+                _persistenceProvider.TryGetContext(serverIdentity, _upstreamServerName, false);
+            if (null == context) {
+                throw new InvalidOperationException();
+            }
+            if (null == lastConfigAnchor) {
+                lastConfigAnchor = context.ConfigAnchor;
+            }
             using (ServerSyncWebService remote = new ServerSyncWebService(_upstreamServerName)) {
                 // TODO : Should attempt with retry in case cookie has expired.
                 ServerSyncConfigData configData = remote.GetConfigData(_cookie, lastConfigAnchor);
-
+                context.UpdateAnchor(configData.NewConfigAnchor);
                 int i = 1;
             }
         }
 
         private SSWS.Cookie _cookie;
-        private IPersistenceProvider _serverIdentityProvider;
+        private IPersistenceProvider _persistenceProvider;
         private string _upstreamServerName;
     }
 }
