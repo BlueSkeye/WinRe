@@ -9,22 +9,16 @@ using System.Web.Services.Protocols;
 #pragma warning disable 1591
 namespace UpdMngr.WebServices.DSSAuthorization
 {
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [WebServiceBindingAttribute(Name = "DssAuthWebServiceSoap",
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [WebServiceBinding(Name = "DssAuthWebServiceSoap",
         Namespace = "http://www.microsoft.com/SoftwareDistribution/Server/DssAuthWebService")]
-    public partial class DssAuthWebService
-        : SoapHttpClientProtocol
+    public partial class DssAuthWebService : BaseUpdateWebService
     {
-        public DssAuthWebService()
+        public DssAuthWebService(string serverName, string versionPrefix, string relativeUrl)
+            : base(serverName, versionPrefix, relativeUrl)
         {
-            this.Url = DefaultUrl;
-        }
-
-        public new string Url
-        {
-            get { return base.Url; }
-            set { base.Url = value; }
+            return;
         }
 
         public new bool UseDefaultCredentials
@@ -33,7 +27,7 @@ namespace UpdMngr.WebServices.DSSAuthorization
             set { base.UseDefaultCredentials = value; }
         }
 
-        [SoapDocumentMethodAttribute("http://www.microsoft.com/SoftwareDistribution/Server/DssAuthWebService/GetAuthorizationCookie",
+        [SoapDocumentMethod("http://www.microsoft.com/SoftwareDistribution/Server/DssAuthWebService/GetAuthorizationCookie",
             RequestNamespace = "http://www.microsoft.com/SoftwareDistribution/Server/DssAuthWebService",
             ResponseNamespace = "http://www.microsoft.com/SoftwareDistribution/Server/DssAuthWebService",
             Use = SoapBindingUse.Literal,
@@ -46,7 +40,7 @@ namespace UpdMngr.WebServices.DSSAuthorization
                 accountName, accountGuid, programKeys);
         }
 
-        [SoapDocumentMethodAttribute("http://www.microsoft.com/SoftwareDistribution/Server/IMonitorable/Ping",
+        [SoapDocumentMethod("http://www.microsoft.com/SoftwareDistribution/Server/IMonitorable/Ping",
             RequestNamespace = "http://www.microsoft.com/SoftwareDistribution/Server/IMonitorable",
             ResponseNamespace = "http://www.microsoft.com/SoftwareDistribution/Server/IMonitorable",
             Use = SoapBindingUse.Literal,
@@ -62,25 +56,23 @@ namespace UpdMngr.WebServices.DSSAuthorization
             object[] results = this.Invoke(methodName, args);
             return (T)(results[0]);
         }
-
-        private const string DefaultUrl = "http://update.microsoft.com/DssAuthWebService/DssAuthWebService.asmx";
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution/Server/DssAuthWebService")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution/Server/DssAuthWebService")]
     public partial class AuthorizationCookie
     {
         public string PlugInId { get; set; }
-        [XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElement(DataType = "base64Binary")]
         public byte[] CookieData { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution/Server/IMonitorable")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution/Server/IMonitorable")]
     public partial class MonitoredServicesResponse
     {
         public string ConfigFileEnvironmentName { get; set; }

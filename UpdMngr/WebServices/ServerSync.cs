@@ -8,32 +8,16 @@ using System.ComponentModel;
 
 namespace UpdMngr.WebServices.ServerSync
 {
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [WebServiceBindingAttribute(Name = "ServerSyncProxySoap",
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [WebServiceBinding(Name = "ServerSyncProxySoap",
         Namespace = "http://www.microsoft.com/SoftwareDistribution")]
-    public partial class ServerSyncProxy : SoapHttpClientProtocol
+    public partial class ServerSyncWebService : BaseUpdateWebService
     {
-        //private System.Threading.SendOrPostCallback GetAuthConfigOperationCompleted;
-        //private System.Threading.SendOrPostCallback GetCookieOperationCompleted;
-        //private System.Threading.SendOrPostCallback GetConfigDataOperationCompleted;
-        //private System.Threading.SendOrPostCallback GetRevisionIdListOperationCompleted;
-        //private System.Threading.SendOrPostCallback GetUpdateDataOperationCompleted;
-        //private System.Threading.SendOrPostCallback DownloadFilesOperationCompleted;
-        //private System.Threading.SendOrPostCallback GetDeploymentsOperationCompleted;
-        //private System.Threading.SendOrPostCallback GetRelatedRevisionsForUpdatesOperationCompleted;
-        //private System.Threading.SendOrPostCallback PingOperationCompleted;
-
-        /// <remarks/>
-        public ServerSyncProxy()
+        public ServerSyncWebService(string serverName = Constants.MicrosoftServerName)
+            : base(serverName, VersionPrefix, "ServerSyncWebService/ServerSyncWebService.asmx")
         {
-            this.Url = DefaultUrl;
-        }
-
-        public new string Url
-        {
-            get { return base.Url; }
-            set { base.Url = value; }
+            return;
         }
 
         public new bool UseDefaultCredentials
@@ -42,18 +26,21 @@ namespace UpdMngr.WebServices.ServerSync
             set { base.UseDefaultCredentials = value; }
         }
 
-        [SoapDocumentMethodAttribute("http://www.microsoft.com/SoftwareDistribution/GetAuthConfig",
+        public static string VersionPrefix
+        {
+            get { return "v6"; }
+        }
+
+        [SoapDocumentMethod("http://www.microsoft.com/SoftwareDistribution/GetAuthConfig",
             RequestNamespace = "http://www.microsoft.com/SoftwareDistribution",
             ResponseNamespace = "http://www.microsoft.com/SoftwareDistribution",
             Use = SoapBindingUse.Literal, ParameterStyle = SoapParameterStyle.Wrapped)]
         public ServerAuthConfig GetAuthConfig()
         {
-            return Invoke<ServerAuthConfig>(
-                "GetAuthConfig");
+            return Invoke<ServerAuthConfig>("GetAuthConfig");
         }
 
-        /// <remarks/>
-        [SoapDocumentMethodAttribute("http://www.microsoft.com/SoftwareDistribution/GetCookie",
+        [SoapDocumentMethod("http://www.microsoft.com/SoftwareDistribution/GetCookie",
             RequestNamespace = "http://www.microsoft.com/SoftwareDistribution",
             ResponseNamespace = "http://www.microsoft.com/SoftwareDistribution",
             Use = SoapBindingUse.Literal, ParameterStyle = SoapParameterStyle.Wrapped)]
@@ -64,8 +51,7 @@ namespace UpdMngr.WebServices.ServerSync
                 authCookies, oldCookie, protocolVersion);
         }
 
-        /// <remarks/>
-        [SoapDocumentMethodAttribute("http://www.microsoft.com/SoftwareDistribution/GetConfigData",
+        [SoapDocumentMethod("http://www.microsoft.com/SoftwareDistribution/GetConfigData",
             RequestNamespace = "http://www.microsoft.com/SoftwareDistribution",
             ResponseNamespace = "http://www.microsoft.com/SoftwareDistribution",
             Use = SoapBindingUse.Literal, ParameterStyle = SoapParameterStyle.Wrapped)]
@@ -76,8 +62,7 @@ namespace UpdMngr.WebServices.ServerSync
                 cookie, configAnchor);
         }
 
-        /// <remarks/>
-        [SoapDocumentMethodAttribute("http://www.microsoft.com/SoftwareDistribution/GetRevisionIdList",
+        [SoapDocumentMethod("http://www.microsoft.com/SoftwareDistribution/GetRevisionIdList",
             RequestNamespace = "http://www.microsoft.com/SoftwareDistribution",
             ResponseNamespace = "http://www.microsoft.com/SoftwareDistribution",
             Use = SoapBindingUse.Literal, ParameterStyle = SoapParameterStyle.Wrapped)]
@@ -88,8 +73,7 @@ namespace UpdMngr.WebServices.ServerSync
                 cookie, filter);
         }
 
-        /// <remarks/>
-        [SoapDocumentMethodAttribute("http://www.microsoft.com/SoftwareDistribution/GetUpdateData",
+        [SoapDocumentMethod("http://www.microsoft.com/SoftwareDistribution/GetUpdateData",
             RequestNamespace = "http://www.microsoft.com/SoftwareDistribution",
             ResponseNamespace = "http://www.microsoft.com/SoftwareDistribution",
             Use = SoapBindingUse.Literal, ParameterStyle = SoapParameterStyle.Wrapped)]
@@ -100,8 +84,7 @@ namespace UpdMngr.WebServices.ServerSync
                 cookie, updateIds);
         }
 
-        /// <remarks/>
-        [SoapDocumentMethodAttribute("http://www.microsoft.com/SoftwareDistribution/DownloadFiles",
+        [SoapDocumentMethod("http://www.microsoft.com/SoftwareDistribution/DownloadFiles",
             RequestNamespace = "http://www.microsoft.com/SoftwareDistribution",
             ResponseNamespace = "http://www.microsoft.com/SoftwareDistribution",
             Use = SoapBindingUse.Literal, ParameterStyle = SoapParameterStyle.Wrapped)]
@@ -111,8 +94,7 @@ namespace UpdMngr.WebServices.ServerSync
                 new object[] { cookie, fileDigestList});
         }
 
-        /// <remarks/>
-        [SoapDocumentMethodAttribute("http://www.microsoft.com/SoftwareDistribution/GetDeployments",
+        [SoapDocumentMethod("http://www.microsoft.com/SoftwareDistribution/GetDeployments",
             RequestNamespace = "http://www.microsoft.com/SoftwareDistribution",
             ResponseNamespace = "http://www.microsoft.com/SoftwareDistribution",
             Use = SoapBindingUse.Literal, ParameterStyle = SoapParameterStyle.Wrapped)]
@@ -123,8 +105,7 @@ namespace UpdMngr.WebServices.ServerSync
                 cookie, deploymentAnchor, syncAnchor);
         }
 
-        /// <remarks/>
-        [SoapDocumentMethodAttribute("http://www.microsoft.com/SoftwareDistribution/GetRelatedRevisionsForUpdates",
+        [SoapDocumentMethod("http://www.microsoft.com/SoftwareDistribution/GetRelatedRevisionsForUpdates",
             RequestNamespace = "http://www.microsoft.com/SoftwareDistribution",
             ResponseNamespace = "http://www.microsoft.com/SoftwareDistribution",
             Use = SoapBindingUse.Literal, ParameterStyle = SoapParameterStyle.Wrapped)]
@@ -135,8 +116,7 @@ namespace UpdMngr.WebServices.ServerSync
                 cookie, updateIDs);
         }
 
-        /// <remarks/>
-        [SoapDocumentMethodAttribute("http://www.microsoft.com/SoftwareDistribution/Server/IMonitorable/Ping",
+        [SoapDocumentMethod("http://www.microsoft.com/SoftwareDistribution/Server/IMonitorable/Ping",
             RequestNamespace = "http://www.microsoft.com/SoftwareDistribution/Server/IMonitorable",
             ResponseNamespace = "http://www.microsoft.com/SoftwareDistribution/Server/IMonitorable",
             Use = SoapBindingUse.Literal, ParameterStyle = SoapParameterStyle.Wrapped)]
@@ -156,23 +136,21 @@ namespace UpdMngr.WebServices.ServerSync
         private const string DefaultUrl = "http://update.microsoft.com/serversyncwebservice/ServerSyncProxy.asmx";
     }
 
-    /// <remarks/>
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class ServerAuthConfig
     {
-        public System.DateTime LastChange { get; set; }
+        public DateTime LastChange { get; set; }
         public AuthPlugInInfo[] AuthInfo { get; set; }
         public int[] AllowedEventIds { get; set; }
     }
 
-    /// <remarks/>
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class AuthPlugInInfo
     {
         public string PlugInID { get; set; }
@@ -180,10 +158,10 @@ namespace UpdMngr.WebServices.ServerSync
         public string Parameter { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution/Server/IMonitorable")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution/Server/IMonitorable")]
     public partial class MonitoredServicesResponse
     {
         public bool SuccessFlag { get; set; }
@@ -203,10 +181,10 @@ namespace UpdMngr.WebServices.ServerSync
         public string CustomInfo { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class ServerSyncDeployment
     {
         public Guid UpdateId { get; set; }
@@ -221,10 +199,10 @@ namespace UpdMngr.WebServices.ServerSync
         public byte DownloadPriority { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class ServerSyncTargetGroup
     {
         public Guid TargetGroupID { get; set; }
@@ -233,10 +211,10 @@ namespace UpdMngr.WebServices.ServerSync
         public bool IsBuiltin { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class ServerSyncDeploymentResult
     {
         public string Anchor { get; set; }
@@ -247,93 +225,93 @@ namespace UpdMngr.WebServices.ServerSync
         public Guid[] AcceptedEulas { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class ServerSyncUrlData
     {
-        [XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElement(DataType = "base64Binary")]
         public byte[] FileDigest { get; set; }
         public string MUUrl { get; set; }
         public string UssUrl { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class ServerSyncUpdateData
     {
         public UpdateIdentity Id { get; set; }
         public string XmlUpdateBlob { get; set; }
         public byte[][] FileDigestList { get; set; }
-        [XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElement(DataType = "base64Binary")]
         public byte[] XmlUpdateBlobCompressed { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class UpdateIdentity
     {
         public System.Guid UpdateID { get; set; }
         public int RevisionNumber { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class ServerUpdateData
     {
         public ServerSyncUpdateData[] updates { get; set; }
         public ServerSyncUrlData[] fileUrls { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class RevisionIdList
     {
         public string Anchor { get; set; }
         public UpdateIdentity[] NewRevisions { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class LanguageAndDelta
     {
         public int Id { get; set; }
         public bool Delta { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class IdAndDelta
     {
         public System.Guid Id { get; set; }
         public bool Delta { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class Version
     {
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class ServerSyncFilter
     {
         public Version DssProtocolVersion { get; set; }
@@ -345,10 +323,10 @@ namespace UpdMngr.WebServices.ServerSync
         public LanguageAndDelta[] Languages { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class ServerSyncLanguageData
     {
         public int LanguageID { get; set; }
@@ -357,10 +335,10 @@ namespace UpdMngr.WebServices.ServerSync
         public bool Enabled { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class ServerSyncConfigData
     {
         public bool CatalogOnlySync { get; set; }
@@ -372,25 +350,25 @@ namespace UpdMngr.WebServices.ServerSync
         public ServerSyncLanguageData[] LanguageUpdateList { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class Cookie
     {
-        public System.DateTime Expiration { get; set; }
-        [XmlElementAttribute(DataType = "base64Binary")]
+        public DateTime Expiration { get; set; }
+        [XmlElement(DataType = "base64Binary")]
         public byte[] EncryptedData { get; set; }
     }
 
-    [SerializableAttribute()]
-    [DebuggerStepThroughAttribute()]
-    [DesignerCategoryAttribute("code")]
-    [XmlTypeAttribute(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
+    [Serializable()]
+    [DebuggerStepThrough()]
+    [DesignerCategory("code")]
+    [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class AuthorizationCookie
     {
         public string PlugInId { get; set; }
-        [XmlElementAttribute(DataType = "base64Binary")]
+        [XmlElement(DataType = "base64Binary")]
         public byte[] CookieData { get; set; }
     }
 #pragma warning restore 1591
