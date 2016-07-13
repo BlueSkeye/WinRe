@@ -39,19 +39,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\IPersistenceProvider.cs" />
+    <Compile Include="Api\IUpdateDescriptor.cs" />
     <Compile Include="Api\IUpstreamServerContext.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Data\BasePersistenceDocument.cs" />
     <Compile Include="Data\ServerIdentity.cs" />
+    <Compile Include="Data\UpdateDescriptor.cs" />
     <Compile Include="Data\UpstreamServerContext.cs" />
     <Compile Include="Data\XmlBasedPersistenceProvider.cs" />
     <Compile Include="DownstreamUpdateServer.cs" />
     <Compile Include="Api\IReadOnlyAuthorizationCookie.cs" />
     <Compile Include="Api\IReadOnlyCookie.cs" />
     <Compile Include="Api\IServerIdentity.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Helpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UpdateManagerException.cs" />
-    <Compile Include="UpdateServer.cs" />
+    <Compile Include="UpdateServerBase.cs" />
     <Compile Include="WebServices\BaseUpdateWebService.cs">
       <SubType>Component</SubType>
     </Compile>

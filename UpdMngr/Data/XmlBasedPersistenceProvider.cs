@@ -26,11 +26,26 @@ namespace UpdMngr.Data
                 _baseDirectory.Create();
                 _baseDirectory.Refresh();
             }
+            if (null == UpdateSerializer) {
+                UpdateSerializer = new XmlSerializer(typeof(UpdateDescriptor));
+            }
         }
 
         private FileInfo ServerIdFile
         {
             get { return new FileInfo(Path.Combine(_baseDirectory.FullName, ServerIdFileName)); }
+        }
+
+        public IUpdateDescriptor CreateUpdateDescriptor(object container, Guid id, int revision)
+        {
+            if (null == container) {
+                throw new ArgumentNullException();
+            }
+            UpdateContainer realContainer = container as UpdateContainer;
+            if (null == realContainer) {
+                throw new ArgumentException();
+            }
+            return new UpdateDescriptor(realContainer, id, revision);
         }
 
         private DirectoryInfo EnsureStorageDirectory(IServerIdentity owner)
@@ -43,6 +58,26 @@ namespace UpdMngr.Data
                 targetDirectory.Refresh();
             }
             return targetDirectory;
+        }
+
+        public object EnsureUpdateContainer(IUpstreamServerContext context, Guid id, int revision)
+        {
+            return new UpdateContainer(
+                EnsureUpstreamServerContextDirectory(
+                    EnsureStorageDirectory(context.Owner), context.ServerName)
+                .EnsureSubDirectory(id.ToString()));
+        }
+
+        private static DirectoryInfo EnsureUpstreamServerContextDirectory(DirectoryInfo storeInto,
+            string serverName)
+        {
+            // TODO : Should perform some kind of canonicalization on server name.
+            DirectoryInfo result = new DirectoryInfo(Path.Combine(storeInto.FullName, serverName));
+            if (!result.Exists) {
+                result.Create();
+                result.Refresh();
+            }
+            return result;
         }
 
         private static XmlSerializer GetSerializer(Type forType)
@@ -86,6 +121,17 @@ namespace UpdMngr.Data
             }
         }
 
+        private FileInfo GetUpdateDescriptorFile(UpdateDescriptor descriptor)
+        {
+            UpdateContainer container = descriptor.Container as UpdateContainer;
+            if (null == container) {
+                throw new ArgumentException();
+            }
+            return new FileInfo(
+                Path.Combine(container.Container.FullName,
+                    string.Format("{0}-Rev{1}.xml", descriptor.Id, descriptor.Revision)));
+        }
+
         private static string GetUpstreamServerContextFileName(DirectoryInfo storeInto,
             UpstreamServerContext context)
         {
@@ -95,6 +141,7 @@ namespace UpdMngr.Data
         private static string GetUpstreamServerContextFileName(DirectoryInfo storeInto,
             string serverName)
         {
+            storeInto = EnsureUpstreamServerContextDirectory(storeInto, serverName);
             // TODO : Should perform some kind of canonicalization on server name.
             return Path.Combine(storeInto.FullName,
                 string.Format(UpstreamServerContextNamePattern, serverName));
@@ -138,16 +185,36 @@ namespace UpdMngr.Data
             }
         }
 
+        public void Save(IUpdateDescriptor descriptor)
+        {
+            if (null == descriptor) { throw new ArgumentNullException(); }
+            UpdateDescriptor realDescriptor = descriptor as UpdateDescriptor;
+            if (null == realDescriptor) {
+                throw new ArgumentException();
+            }
+            FileInfo descriptorFile = GetUpdateDescriptorFile(realDescriptor);
+            using (FileStream into = File.Open(descriptorFile.FullName, FileMode.Create, FileAccess.Write)) {
+                UpdateSerializer.Serialize(into, descriptor);
+            }
+            return;
+        }
+
         public IUpstreamServerContext TryGetContext(IServerIdentity owner, string upstreamServerName,
             bool createIfNotFound)
         {
+            if (null == owner) {
+                throw new ArgumentNullException();
+            }
             if (string.IsNullOrEmpty(upstreamServerName)) {
                 throw new ArgumentNullException();
             }
             DirectoryInfo storeInto = EnsureStorageDirectory(owner);
             try {
-                return ReadFromStorage<UpstreamServerContext>(
+                UpstreamServerContext result = ReadFromStorage<UpstreamServerContext>(
                     GetUpstreamServerContextFileName(storeInto, upstreamServerName));
+
+                result.Owner = owner;
+                return result;
             }
             catch {
                 return (createIfNotFound) ? new UpstreamServerContext(this) : null;
@@ -158,5 +225,16 @@ namespace UpdMngr.Data
         private const string UpstreamServerContextNamePattern = "USS-{0}.xml";
         private DirectoryInfo _baseDirectory;
         private static Dictionary<Type, XmlSerializer> _serializerByType;
+        private static XmlSerializer UpdateSerializer;
+
+        internal class UpdateContainer
+        {
+            internal UpdateContainer(DirectoryInfo container)
+            {
+                Container = container;
+            }
+
+            internal DirectoryInfo Container { get; private set; }
+        }
     }
 }

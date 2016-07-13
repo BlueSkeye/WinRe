@@ -34,7 +34,7 @@ namespace UpdMngr.Data
             private set { _ConfigAnchor = value; }
         }
 
-        [XmlElement("anchor", IsNullable = true)]
+        [XmlElement("configAnchor", IsNullable = true)]
         public string _ConfigAnchor { get; set; }
 
         [XmlIgnore()]
@@ -53,6 +53,16 @@ namespace UpdMngr.Data
 
         [XmlAttribute("serverName")]
         public string ServerName { get; set; }
+
+        [XmlIgnore()]
+        public string SyncAnchor
+        {
+            get { return _SyncAnchor; }
+            private set { _SyncAnchor = value; }
+        }
+
+        [XmlElement("syncAnchor", IsNullable = true)]
+        public string _SyncAnchor { get; set; }
 
         private IServerIdentity _owner;
 
@@ -80,9 +90,16 @@ namespace UpdMngr.Data
             return;
         }
 
-        public void UpdateAnchor(string newValue)
+        public void UpdateConfigAnchor(string newValue)
         {
             ConfigAnchor = newValue;
+            PersistanceHandler.Rewrite(this);
+            return;
+        }
+
+        public void UpdateSyncAnchor(string newValue)
+        {
+            SyncAnchor = newValue;
             PersistanceHandler.Rewrite(this);
             return;
         }

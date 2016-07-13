@@ -6,6 +6,8 @@ using System.Web.Services.Protocols;
 using System.Xml.Serialization;
 using System.ComponentModel;
 
+using UpdMngr.Api;
+
 namespace UpdMngr.WebServices.ServerSync
 {
     [DebuggerStepThrough()]
@@ -356,6 +358,17 @@ namespace UpdMngr.WebServices.ServerSync
     [XmlType(Namespace = "http://www.microsoft.com/SoftwareDistribution")]
     public partial class Cookie
     {
+        public Cookie()
+        {
+        }
+
+        public Cookie(IReadOnlyCookie copyFrom)
+        {
+            this.Expiration = copyFrom.Expiration;
+            this.EncryptedData = (byte[])(copyFrom.EncryptedData.Clone());
+            return;
+        }
+
         public DateTime Expiration { get; set; }
         [XmlElement(DataType = "base64Binary")]
         public byte[] EncryptedData { get; set; }
