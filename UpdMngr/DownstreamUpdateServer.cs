@@ -152,14 +152,15 @@ namespace UpdMngr
             throw new InvalidOperationException();
         }
 
-        public void GetRevisions(bool forceNullConfigAnchor = false)
+        public void GetRevisionsAndUpdateData(bool forConfiguration,
+            bool forceNullConfigAnchor = false)
         {
             if (null == _upstreamServerConfigurationData) {
                 RetrieveUpstreamConfigurationData(null, forceNullConfigAnchor);
             }
             IUpstreamServerContext context = GetMandatoryContext();
             ServerSyncFilter filter = new ServerSyncFilter() {
-                GetConfig = true,
+                GetConfig = forConfiguration,
                 Get63LanguageOnly = false
             };
             if (!forceNullConfigAnchor && (null != context.SyncAnchor)) {

@@ -28,7 +28,7 @@ namespace UpdMngrTest
                 new XmlBasedPersistenceProvider(TestDataDirectory);
             using (DownstreamUpdateServer dss = new DownstreamUpdateServer(dataProvider)) {
                 dss.RetrieveUpstreamConfigurationData(null);
-                dss.GetRevisions(false);
+                dss.GetRevisionsAndUpdateData(true, false);
             }
         }
 
