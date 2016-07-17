@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="CommandLineInstallation"
+    targetNamespace="http://schemas.microsoft.com/wsus/2002/12/Installers/CommandLineInstallation.xsd"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns:cmd="http://schemas.microsoft.com/wsus/2002/12/Installers/CommandLineInstallation.xsd"
+    xmlns:bt="http://schemas.microsoft.com/wsus/2002/12/BaseTypes.xsd"
+    xmlns:mspblob="http://www.microsoft.com/msi/patch_applicability.xsd" 
+    xmlns:sdp="http://schemas.microsoft.com/wsus/2002/12/SoftwareDistributionPackage.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/BaseTypes.xsd"
+      schemaLocation="BaseTypes.xsd" />
+  <xs:import namespace="http://www.microsoft.com/msi/patch_applicability.xsd"
+      schemaLocation="PatchApplicability.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/SoftwareDistributionPackage.xsd"
+      schemaLocation="SoftwareDistributionPackage.xsd" />
+
+  <xs:element name="CommandLineInstallerData" substitutionGroup="sdp:InstallHandlerSpecificData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="ReturnCode" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="LocalizedDescription" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Language" type="sdp:LocalizedPropertiesLanguage" maxOccurs="unbounded"/>
+                    <xs:element name="Description" type="sdp:Description"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="Code" type="xs:int" use="required"/>
+            <xs:attribute name="Result" type="cmd:InstallationResult" use="required"/>
+            <xs:attribute name="Reboot" type="xs:boolean" use="optional" default="false"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="WindowsInstallerRepairPath" minOccurs="0" maxOccurs="unbounded" type="mspblob:RepairPath" />
+      </xs:sequence>
+      <xs:attribute name="Program" type="bt:FilePath" use="required"/>
+      <xs:attribute name="Arguments" type="xs:string" use="optional"/>
+      <xs:attribute name="DefaultResult" type="cmd:InstallationResult" use="optional" default="Failed"/>
+      <xs:attribute name="RebootByDefault" type="xs:boolean" use="optional" default="false"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="InstallationResult">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Failed" />
+      <xs:enumeration value="Succeeded" />
+      <xs:enumeration value="Cancelled" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

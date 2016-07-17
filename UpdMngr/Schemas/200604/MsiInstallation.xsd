@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="MsiInstallation"
+    targetNamespace="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/Installers/MsiInstallation.xsd"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns:bt="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/BaseTypes.xsd"
+    xmlns:msi="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/Installers/MsiInstallation.xsd"
+    xmlns:sdp="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/SoftwareDistributionPackage.xsd"
+    xmlns:mspblob="http://www.microsoft.com/msi/patch_applicability.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/BaseTypes.xsd"
+      schemaLocation="BaseTypes.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/SoftwareDistributionPackage.xsd"
+      schemaLocation="SoftwareDistributionPackage.xsd" />
+  <xs:import namespace="http://www.microsoft.com/msi/patch_applicability.xsd"
+      schemaLocation="PatchApplicability.xsd" />
+
+  <xs:simpleType name="MsiInstallerCommandLine">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="32768" />
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="MsiInstallerData" substitutionGroup="sdp:InstallHandlerSpecificData">
+    <xs:complexType>
+      <xs:attribute name="CommandLine" type="msi:MsiInstallerCommandLine" use="optional"/>
+      <xs:attribute name="UninstallCommandLine" type="msi:MsiInstallerCommandLine" use="optional"/>
+      <xs:attribute name="MsiFile" type="bt:FilePath" use="required"/>
+      <xs:attribute name="ProductCode" type="mspblob:GUID" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

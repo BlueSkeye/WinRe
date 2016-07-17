@@ -1,0 +1,265 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="SoftwareDistributionPackage"
+    targetNamespace="http://schemas.microsoft.com/wsus/2002/12/SoftwareDistributionPackage.xsd"
+    elementFormDefault="qualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:bt="http://schemas.microsoft.com/wsus/2002/12/BaseTypes.xsd"
+    xmlns:sdp="http://schemas.microsoft.com/wsus/2002/12/SoftwareDistributionPackage.xsd"
+    xmlns:bar="http://schemas.microsoft.com/wsus/2002/12/BaseApplicabilityRules.xsd"
+    xmlns:msiar="http://schemas.microsoft.com/wsus/2002/12/MsiApplicabilityRules.xsd"
+    xmlns:lar="http://schemas.microsoft.com/wsus/2002/12/LogicalApplicabilityRules.xsd"
+    xmlns:cmd="http://schemas.microsoft.com/wsus/2002/12/Installers/CommandLineInstallation.xsd"
+    xmlns:msi="http://schemas.microsoft.com/wsus/2002/12/Installers/MsiInstallation.xsd"
+    xmlns:msp="http://schemas.microsoft.com/wsus/2002/12/Installers/MspInstallation.xsd"
+    xmlns:drv="http://schemas.microsoft.com/wsus/2002/12/WindowsDriver.xsd"
+    attributeFormDefault="unqualified">
+  
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/BaseTypes.xsd"
+      schemaLocation="BaseTypes.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/BaseApplicabilityRules.xsd"
+      schemaLocation="BaseApplicabilityRules.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/MsiApplicabilityRules.xsd"
+      schemaLocation="MsiApplicabilityRules.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/LogicalApplicabilityRules.xsd"
+      schemaLocation="LogicalApplicabilityRules.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/Installers/CommandLineInstallation.xsd"
+      schemaLocation="CommandLineInstallation.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/Installers/MsiInstallation.xsd"
+      schemaLocation="MsiInstallation.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/Installers/MspInstallation.xsd"
+      schemaLocation="MspInstallation.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/Installers/WindowsDriver.xsd"
+      schemaLocation="WindowsDriver.xsd" />
+  
+  <xs:element name="SoftwareDistributionPackage" type="sdp:SoftwareDistributionPackage" />
+  <xs:simpleType name="SchemaVersion">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{1,5}\.\d{1,5}" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LocalizedPropertiesLanguage">
+    <xs:restriction base="xs:language" />
+  </xs:simpleType>
+  <xs:simpleType name="Title">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="200" />
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Description">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="1500" />
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="LocalizedProperties">
+    <xs:sequence>
+      <xs:element name="Language" type="sdp:LocalizedPropertiesLanguage" />
+      <xs:element name="Title" type="sdp:Title" />
+      <xs:element name="Description" type="sdp:Description" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="UpdateType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Software"/>
+      <xs:enumeration value="Driver"/>
+      <xs:enumeration value="Detectoid"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InstallationImpact">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Normal"/>
+      <xs:enumeration value="Minor"/>
+      <xs:enumeration value="RequiresExclusiveHandling"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InstallationRebootBehavior">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="NeverReboots"/>
+      <xs:enumeration value="AlwaysRequiresReboot"/>
+      <xs:enumeration value="CanRequestReboot"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="InstallProperties">
+    <xs:attribute name="CanRequestUserInput" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="RequiresNetworkConnectivity" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="Impact" type="sdp:InstallationImpact" use="optional" default="Normal" />
+    <xs:attribute name="RebootBehavior" type="sdp:InstallationRebootBehavior" use="optional" default="CanRequestReboot" />
+  </xs:complexType>
+  <xs:element name="InstallHandlerSpecificData" abstract="true"/>
+  <xs:complexType name="InstallableItem">
+    <xs:sequence>
+      <xs:element name="ApplicabilityRules" type="sdp:ApplicabilityRules" minOccurs ="0"/>
+      <xs:element name="InstallProperties" type="sdp:InstallProperties" minOccurs="0"/>
+      <xs:element name="UninstallProperties" type="sdp:InstallProperties" minOccurs="0"/>
+      <xs:element ref="sdp:InstallHandlerSpecificData" minOccurs="0" />
+      <xs:element name="OriginFile" type="sdp:File" minOccurs="0"/>
+      <xs:element name="Language" type="xs:language" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="ID" type="bt:Guid" use="required"/>
+  </xs:complexType>
+  <xs:simpleType name="PublicationState">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Published"/>
+      <xs:enumeration value="Expired"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="ApplicabilityRuleElement" abstract="true"/>
+  <xs:element name="ApplicabilityMetadataElement" abstract="true"/>
+  <xs:complexType name="ApplicabilityRules">
+    <xs:sequence>
+      <xs:element name="IsInstalled" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sdp:ApplicabilityRuleElement" minOccurs="0" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="IsSuperseded" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sdp:ApplicabilityRuleElement" minOccurs="0" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="IsInstallable" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sdp:ApplicabilityRuleElement" minOccurs="0" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Metadata" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sdp:ApplicabilityMetadataElement" minOccurs="0" maxOccurs="unbounded" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Properties">
+    <xs:sequence>
+      <xs:element name="MoreInfoUrl" type="bt:HttpUrl" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="SupportUrl" type="bt:HttpUrl" minOccurs="0"/>
+      <xs:element name="ProductName" type="sdp:Title" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="PackageID" type="bt:Guid" use="required" />
+    <xs:attribute name="CreationDate" type="xs:dateTime" use="required"/>
+    <xs:attribute name="CanSourceBeRequired" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="VendorName" type="sdp:Title" use="optional"/>
+    <xs:attribute name="PublicationState" type="sdp:PublicationState" use="optional"/>
+    <xs:attribute name="RestrictToClientServicingApi" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="UpdateType" type="sdp:UpdateType" use="optional" default="Software"/>
+  </xs:complexType>
+  <xs:complexType name="File">
+    <xs:attribute name="Digest" type="bt:FileDigest" use="required"/>
+    <xs:attribute name="FileName" type="bt:FileName" use="required"/>
+    <xs:attribute name="Size" type="bt:FileSize" use="required"/>
+    <xs:attribute name="Modified" type="bt:FileDate" use="required"/>
+    <xs:attribute name="OriginUri" type="xs:anyURI" use="optional"/>
+  </xs:complexType>
+  <xs:element name="PackageTypeSpecificData" abstract="true"/>
+  <xs:element name="ApplicationSpecificData" substitutionGroup="sdp:PackageTypeSpecificData"/>
+  <xs:element name="UpdateSpecificData" substitutionGroup="sdp:PackageTypeSpecificData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="SecurityBulletinID" type="sdp:SecurityBulletinID" minOccurs="0" maxOccurs="1" />
+        <xs:element name="CveID" type="sdp:CveID" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="KBArticleID" type="sdp:KBArticleID" minOccurs="0" maxOccurs="1" />
+      </xs:sequence>
+      <xs:attribute name="MsrcSeverity" type="sdp:MsrcSeverity" use="optional" />
+      <xs:attribute name="UpdateClassification" type="sdp:UpdateClassification" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="UpdateClassification">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Updates"/>
+      <xs:enumeration value="Critical Updates"/>
+      <xs:enumeration value="Security Updates"/>
+      <xs:enumeration value="Feature Packs"/>
+      <xs:enumeration value="Update Rollups"/>
+      <xs:enumeration value="Service Packs"/>
+      <xs:enumeration value="Tools"/>
+      <xs:enumeration value="Hotfixes"/>
+      <xs:enumeration value="Drivers"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="MsrcSeverity">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Critical" />
+      <xs:enumeration value="Important" />
+      <xs:enumeration value="Moderate" />
+      <xs:enumeration value="Low" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SecurityBulletinID">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="15" />
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="CveID">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="40" />
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="KBArticleID">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="15" />
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="SoftwareDistributionPackage">
+    <xs:sequence>
+      <xs:element name="Properties" type="sdp:Properties" />
+      <xs:element name="LocalizedProperties" type="sdp:LocalizedProperties" maxOccurs="unbounded"/>
+      <xs:element ref="sdp:PackageTypeSpecificData" />
+      <xs:element name="IsInstallable" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sdp:ApplicabilityRuleElement" minOccurs="0" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="IsInstalled" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="sdp:ApplicabilityRuleElement" minOccurs="0" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SupersededPackages" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="PackageID" type="bt:Guid" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Prerequisites" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AtLeastOne" minOccurs="1" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="PackageID" type="bt:Guid" minOccurs="1" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="BundledPackages" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="PackageID" type="bt:Guid" minOccurs="1" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="InstallableItem" type="sdp:InstallableItem" minOccurs="0" maxOccurs="unbounded">
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="SchemaVersion" type="sdp:SchemaVersion" use="required" />
+  </xs:complexType>
+</xs:schema>

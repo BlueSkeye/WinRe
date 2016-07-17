@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="CategoryInformation"
+    targetNamespace="http://schemas.microsoft.com/msus/2002/12/UpdateHandlers/Category"
+    elementFormDefault="qualified"
+    xmlns="http://schemas.microsoft.com/msus/2002/12/UpdateHandlers/Category"
+    xmlns:cat="http://schemas.microsoft.com/msus/2002/12/UpdateHandlers/Category"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+           
+  <xs:complexType name="Category">
+    <xs:sequence>
+      <xs:element name="CategoryInformation" minOccurs="1" maxOccurs="1">
+        <xs:complexType>
+          <!-- TODO : Define a category enumeration. -->
+          <xs:attribute name="CategoryType" type="xs:string" use="required"/>
+          <xs:attribute name="ProhibitsSubcategories"  type="xs:boolean" use="optional"/>
+          <xs:attribute name="ExcludedByDefault" type="xs:boolean" use="required"/>
+        </xs:complexType>
+        </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

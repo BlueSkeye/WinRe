@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="UpdateServicePackage"
+    targetNamespace="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/UpdateServicesPackage.xsd"
+    xmlns:bt="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/BaseTypes.xsd"
+    xmlns:usp="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/UpdateServicesPackage.xsd"
+    xmlns:sdp="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/SoftwareDistributionPackage.xsd"
+    xmlns:mspblob="http://www.microsoft.com/msi/patch_applicability.xsd"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/BaseTypes.xsd"
+      schemaLocation="BaseTypes.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/SoftwareDistributionPackage.xsd"
+      schemaLocation="SoftwareDistributionPackage.xsd" />
+  <xs:import namespace="http://www.microsoft.com/msi/patch_applicability.xsd"
+      schemaLocation="PatchApplicability.xsd" />
+
+  <xs:element name="UpdateServicesPackage" type="usp:UpdateServicesPackage" />
+  <xs:complexType name="UpdateIdentityForBundle">
+    <xs:attribute name="UpdateID" type="bt:Guid" use="required" />
+    <xs:attribute name="RevisionNumber" type="bt:positiveInt" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="UpdateServicesPackage">
+    <xs:sequence>
+      <xs:element name="SoftwareDistributionPackage" type="sdp:SoftwareDistributionPackage" />
+      <xs:element name="UpdateServicesProperties" type="usp:UpdateServicesProperties" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="UpdateServicesProperties">
+    <xs:sequence>
+      <xs:element name="ProductCategoryUpdateID" type="bt:Guid" minOccurs="0" maxOccurs="unbounded">
+      </xs:element>
+      <xs:element name="InstallableItemInfo" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="File" type="sdp:File" maxOccurs="unbounded">
+            </xs:element>
+            <xs:element name="WindowsInstallerRepairPathInfo" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence />
+                <xs:attribute name="TargetId" type="mspblob:GUID"/>
+                <xs:attribute name="Path" type="xs:string"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="ID" type="bt:Guid" use="required"/>
+          <xs:attribute name="InstallPointDirectory" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="BundledUpdates" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="UpdateIdentity" type="usp:UpdateIdentityForBundle" maxOccurs="unbounded" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="BundleLanguage" type="xs:language" minOccurs="0" maxOccurs="unbounded">
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="RevisionNumber" type="bt:positiveInt"/>
+    <xs:attribute name="MaxDownloadSize" type="bt:FileSize" use="optional"/>
+    <xs:attribute name="MinDownloadSize" type="bt:FileSize" use="optional"/>
+    <xs:attribute name="PublisherID" type="bt:Guid"/>
+    <xs:attribute name="CompatibleProtocolVersion" type="sdp:SchemaVersion" use="optional"/>
+    <xs:attribute name="MetadataOnly" type="xs:boolean" use="optional"/>
+  </xs:complexType>
+</xs:schema>

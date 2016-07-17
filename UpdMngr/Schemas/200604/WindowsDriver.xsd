@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="WindowsDriver"
+        targetNamespace="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/Installers/WindowsDriver.xsd"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:bt="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/BaseTypes.xsd"
+        xmlns:sdp="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/SoftwareDistributionPackage.xsd"
+        xmlns:tns="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/Installers/WindowsDriver.xsd"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/BaseTypes.xsd"
+      schemaLocation="BaseTypes.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/SoftwareDistributionPackage.xsd"
+      schemaLocation="SoftwareDistributionPackage.xsd" />
+
+  <xs:simpleType name="HardwareID">
+    <xs:restriction base="xs:string" >
+      <xs:maxLength value="200" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DriverCompany">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="256" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DriverProvider">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="256" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DriverManufacturer">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="256" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DriverClass">
+    <xs:restriction base="xs:token">
+      <enumeration value="Video"/>
+      <enumeration value="Sound"/>
+      <enumeration value="Printers"/>
+      <enumeration value="Modems"/>
+      <enumeration value="Cameras"/>
+      <enumeration value="Scanners"/>
+      <enumeration value="Monitors"/>
+      <enumeration value="Networking"/>
+      <enumeration value="Input Devices"/>
+      <enumeration value="Storage"/>
+      <enumeration value="Personal Computers"/>
+      <enumeration value="Servers and Cluster Solutions"/>
+      <enumeration value="Other Hardware"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DriverModel">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="256" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DriverVerVersion">
+    <xs:restriction base="bt:Version"/>
+  </xs:simpleType>
+  <xs:complexType name="WindowsDriverMetaData">
+    <xs:sequence>
+      <xs:element name="CompatibleProvider" type="tns:DriverProvider" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <attribute name="HardwareID" type="tns:HardwareID" use="required"/>
+    <attribute name="DriverVerDate" type="xs:date" use="required"/>
+    <attribute name="DriverVerVersion" type="tns:DriverVerVersion" use="required"/>
+    <attribute name="WhqlDriverID" type="xs:unsignedInt" use="required"/>
+    <attribute name="Class" type="tns:DriverClass" use="required"/>
+    <attribute name="Company" type="tns:DriverCompany" use="required"/>
+    <attribute name="Provider" type="tns:DriverProvider" use="required"/>
+    <attribute name="Manufacturer" type="tns:DriverManufacturer" use="required"/>
+    <attribute name="Model" type="tns:DriverModel" use="required"/>
+  </xs:complexType>
+  <xs:element name="WindowsDriverMetaData" substitutionGroup="sdp:ApplicabilityMetadataElement" type="tns:WindowsDriverMetaData"/>
+  <xs:element name="WindowsDriverInstalled" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType />
+  </xs:element>
+  <xs:element name="WindowsDriverSuperseded" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType />
+  </xs:element>
+  <xs:element name="WindowsDriverInstallable" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType />
+  </xs:element>
+</xs:schema>

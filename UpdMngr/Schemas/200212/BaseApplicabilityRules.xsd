@@ -1,0 +1,255 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="BaseApplicabilityRules"
+    targetNamespace="http://schemas.microsoft.com/wsus/2002/12/BaseApplicabilityRules.xsd"
+    elementFormDefault="qualified"
+    xmlns:bar="http://schemas.microsoft.com/wsus/2002/12/BaseApplicabilityRules.xsd"
+    xmlns:bt="http://schemas.microsoft.com/wsus/2002/12/BaseTypes.xsd"
+    xmlns:sdp="http://schemas.microsoft.com/wsus/2002/12/SoftwareDistributionPackage.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/BaseTypes.xsd"
+      schemaLocation="BaseTypes.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/SoftwareDistributionPackage.xsd"
+      schemaLocation="SoftwareDistributionPackage.xsd" />
+
+  <xs:element name="WindowsVersion" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attribute name="Comparison" type="bt:ScalarComparison" use="optional" />
+      <xs:attribute name="MajorVersion" type="xs:unsignedInt" use="optional" />
+      <xs:attribute name="MinorVersion" type="xs:unsignedInt" use="optional" />
+      <xs:attribute name="BuildNumber" type="xs:unsignedInt" use="optional" />
+      <xs:attribute name="ServicePackMajor" type="xs:unsignedShort" use="optional" />
+      <xs:attribute name="ServicePackMinor" type="xs:unsignedShort" use="optional" />
+      <xs:attribute name="AllSuitesMustBePresent" type="xs:boolean" use="optional" default="false" />
+      <xs:attribute name="SuiteMask" type="xs:unsignedShort" use="optional" />
+      <xs:attribute name="ProductType" type="xs:unsignedShort" use="optional" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="WindowsLanguage" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attribute name="Language" type="xs:language" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MuiInstalled" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType />
+  </xs:element>
+  <xs:element name="MuiLanguageInstalled" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attribute name="Language" type="xs:language" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SystemMetric" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attribute name="Comparison" type="bt:ScalarComparison" use="required" />
+      <xs:attribute name="Index" type="xs:int" use="required" />
+      <xs:attribute name="Value" type="xs:int" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Processor" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attribute name="Architecture" type="bt:ProcessorArchitecture" use="required" />
+      <xs:attribute name="Level" type="bt:ProcessorLevel" use="optional" />
+      <xs:attribute name="Revision" type="bt:ProcessorRevision" use="optional" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="NumberOfProcessors" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attribute name="Comparison" type="bt:ScalarComparison" use="required" />
+      <xs:attribute name="Number" type="xs:unsignedInt" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ClusteredOS" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType />
+  </xs:element>
+  <xs:element name="ClusterResourceOwner" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attributeGroup ref="bt:RegistryValueAttributes" />
+      <xs:attribute name="Prefix" type="xs:string" use="optional" />
+      <xs:attribute name="Suffix" type="xs:string" use="optional" />
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="FileExistsType">
+    <xs:attribute name="Path" type="bt:FilePath" use="required" />
+    <xs:attribute name="Version" type="bt:Version" use="optional" />
+    <xs:attribute name="Created" type="bt:FileDate" use="optional" />
+    <xs:attribute name="Modified" type="bt:FileDate" use="optional" />
+    <xs:attribute name="Size" type="bt:FileSize" use="optional" />
+    <xs:attribute name="Language" type="xs:unsignedShort" use="optional" />
+  </xs:complexType>
+  <xs:element name="FileExists" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="bar:FileExistsType">
+          <xs:attribute name="Csidl" type="bt:Csidl" use="optional" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FileExistsPrependRegSz" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="bar:FileExistsType">
+          <xs:attributeGroup ref="bt:RegistryValueAttributes" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="FileCompareVersionType">
+    <xs:attribute name="Path" type="bt:FilePath" use="required" />
+    <xs:attribute name="Comparison" type="bt:ScalarComparison" use="required" />
+    <xs:attribute name="Version" type="bt:Version" use="required" />
+  </xs:complexType>
+  <xs:element name="FileVersion" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="bar:FileCompareVersionType">
+          <xs:attribute name="Csidl" type="bt:Csidl" use="optional" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FileVersionPrependRegSz" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="bar:FileCompareVersionType">
+          <xs:attributeGroup ref="bt:RegistryValueAttributes" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="FileCompareCreationDateType">
+    <xs:attribute name="Path" type="bt:FilePath" use="required" />
+    <xs:attribute name="Comparison" type="bt:ScalarComparison" use="required" />
+    <xs:attribute name="Created" type="bt:FileDate" use="required" />
+  </xs:complexType>
+  <xs:element name="FileCreated" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="bar:FileCompareCreationDateType">
+          <xs:attribute name="Csidl" type="bt:Csidl" use="optional" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FileCreatedPrependRegSz" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="bar:FileCompareCreationDateType">
+          <xs:attributeGroup ref="bt:RegistryValueAttributes" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="FileCompareModificationDateType">
+    <xs:attribute name="Path" type="bt:FilePath" use="required" />
+    <xs:attribute name="Comparison" type="bt:ScalarComparison" use="required" />
+    <xs:attribute name="Modified" type="bt:FileDate" use="required" />
+  </xs:complexType>
+  <xs:element name="FileModified" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="bar:FileCompareModificationDateType">
+          <xs:attribute name="Csidl" type="bt:Csidl" use="optional" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FileModifiedPrependRegSz" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="bar:FileCompareModificationDateType">
+          <xs:attributeGroup ref="bt:RegistryValueAttributes" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="FileCompareSizeType">
+    <xs:attribute name="Path" type="bt:FilePath" use="required" />
+    <xs:attribute name="Comparison" type="bt:ScalarComparison" use="required" />
+    <xs:attribute name="Size" type="bt:FileSize" use="required" />
+  </xs:complexType>
+  <xs:element name="FileSize" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="bar:FileCompareSizeType">
+          <xs:attribute name="Csidl" type="bt:Csidl" use="optional" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FileSizePrependRegSz" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="bar:FileCompareSizeType">
+          <xs:attributeGroup ref="bt:RegistryValueAttributes" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RegKeyExists" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attributeGroup ref="bt:RegistryKeyAttributes" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RegValueExists" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attributeGroup ref="bt:RegistryKeyAttributes" />
+      <xs:attribute name="Value" type="bt:RegistryValue" use="optional" />
+      <xs:attribute name="Type" type="bt:RegistryValueType" use="optional" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RegDword" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attributeGroup ref="bt:RegistryValueAttributes" />
+      <xs:attribute name="Comparison" type="bt:ScalarComparison" use="required" />
+      <xs:attribute name="Data" type="bt:RegistryValueDword" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RegExpandSz" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attributeGroup ref="bt:RegistryValueAttributes" />
+      <xs:attribute name="Comparison" type="bt:StringComparison" use="required" />
+      <xs:attribute name="Data" type="bt:RegistryValueExpandSz" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RegSz" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attributeGroup ref="bt:RegistryValueAttributes" />
+      <xs:attribute name="Comparison" type="bt:StringComparison" use="required" />
+      <xs:attribute name="Data" type="bt:RegistryValueSz" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RegSzToVersion" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attributeGroup ref="bt:RegistryValueAttributes" />
+      <xs:attribute name="Comparison" type="bt:ScalarComparison" use="required" />
+      <xs:attribute name="Data" type="bt:Version" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RegKeyLoop" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="sdp:ApplicabilityRuleElement" />
+      </xs:sequence>
+      <xs:attributeGroup ref="bt:RegistryKeyAttributes" />
+      <xs:attribute name="TrueIf" type="bt:LoopLogic" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="WmiQuery" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attribute name="Namespace" type="bt:WmiNamespace" use="optional" />
+      <xs:attribute name="WqlQuery" type="bt:WmiWqlQuery" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="InstalledOnce" substitutionGroup="sdp:ApplicabilityRuleElement">
+  </xs:element>
+  <xs:element name="GenericQuery" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attribute name="Namespace" type="xs:string" use="required" />
+      <xs:attribute name="Type" type="xs:string" use="required" />
+      <xs:attribute name="Parameter" type="xs:string" use="required" />
+      <xs:attribute name="Comparison" type="bt:ScalarComparison" use="optional" />
+      <xs:attribute name="Value" type="xs:string" use="optional" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

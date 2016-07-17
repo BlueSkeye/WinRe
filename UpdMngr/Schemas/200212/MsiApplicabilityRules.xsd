@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="MsiApplicabilityRules"
+    targetNamespace="http://schemas.microsoft.com/wsus/2002/12/MsiApplicabilityRules.xsd"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"       
+    xmlns="http://schemas.microsoft.com/wsus/2002/12/MsiApplicabilityRules.xsd"
+    xmlns:bt="http://schemas.microsoft.com/wsus/2002/12/BaseTypes.xsd"
+    xmlns:sdp="http://schemas.microsoft.com/wsus/2002/12/SoftwareDistributionPackage.xsd"
+    xmlns:msiar="http://schemas.microsoft.com/wsus/2002/12/MsiApplicabilityRules.xsd" 
+    xmlns:mspblob="http://www.microsoft.com/msi/patch_applicability.xsd" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/BaseTypes.xsd"
+      schemaLocation="BaseTypes.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/SoftwareDistributionPackage.xsd"
+      schemaLocation="SoftwareDistributionPackage.xsd" />
+  <xs:import namespace="http://www.microsoft.com/msi/patch_applicability.xsd"
+      schemaLocation="PatchApplicability.xsd" />
+
+  <xs:element name="MsiProductInstalled" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attribute name="ProductCode" type="mspblob:GUID" use="required"/>
+      <xs:attribute name="VersionMax" type="mspblob:Version" use="optional"/>
+      <xs:attribute name="ExcludeVersionMax" type="xs:boolean" use="optional" default="false"/>
+      <xs:attribute name="VersionMin" type="mspblob:Version" use="optional"/>
+      <xs:attribute name="ExcludeVersionMin" type="xs:boolean" use="optional" default="false"/>
+      <xs:attribute name="Language" type="xs:int" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="MsiFeatureInstalledForProduct" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Feature" type="bt:MsiFeatureName" minOccurs="1" maxOccurs="unbounded" />
+        <xs:element name="Product" type="mspblob:GUID" minOccurs="1" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="AllFeaturesRequired" type="xs:boolean" use="optional" default="false" />
+      <xs:attribute name="AllProductsRequired" type="xs:boolean" use="optional" default="false" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="MsiComponentInstalledForProduct" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Component" type="bt:MsiComponentCode" minOccurs="1" maxOccurs="unbounded" />
+        <xs:element name="Product" type="mspblob:GUID" minOccurs="1" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="AllComponentsRequired" type="xs:boolean" use="optional" default="false" />
+      <xs:attribute name="AllProductsRequired" type="xs:boolean" use="optional" default="false" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="MsiPatchInstalledForProduct" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:attribute name="PatchCode" type="mspblob:GUID" use="required"/>
+      <xs:attribute name="ProductCode" type="mspblob:GUID" use="required"/>
+      <xs:attribute name="VersionMax" type="mspblob:Version" use="optional"/>
+      <xs:attribute name="ExcludeVersionMax" type="xs:boolean" use="optional" default="false"/>
+      <xs:attribute name="VersionMin" type="mspblob:Version" use="optional"/>
+      <xs:attribute name="ExcludeVersionMin" type="xs:boolean" use="optional" default="false"/>
+      <xs:attribute name="Language" type="xs:int" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MsiPatchInstalled" substitutionGroup="sdp:ApplicabilityRuleElement"/>
+  <xs:element name="MsiPatchSuperseded" substitutionGroup="sdp:ApplicabilityRuleElement"/>
+  <xs:element name="MsiPatchInstallable" substitutionGroup="sdp:ApplicabilityRuleElement"/>
+  <xs:element name="MsiApplicationInstalled" substitutionGroup="sdp:ApplicabilityRuleElement"/>
+  <xs:element name="MsiApplicationSuperseded" substitutionGroup="sdp:ApplicabilityRuleElement"/>
+  <xs:element name="MsiApplicationInstallable" substitutionGroup="sdp:ApplicabilityRuleElement"/>
+  <xs:complexType name="MsiPatchMetadataStuff">
+    <xs:sequence>
+      <xs:element ref="mspblob:MsiPatch" />
+      <xs:element name="FallbackPatchCode" type="mspblob:GUID" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="MsiPatchMetadata" substitutionGroup="sdp:ApplicabilityMetadataElement" type="msiar:MsiPatchMetadataStuff"/>
+  <xs:complexType name="MsiApplicationMetadataStuff">
+    <xs:sequence>
+      <xs:element name="ProductCode" type="mspblob:GUID" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="MsiApplicationMetadata" substitutionGroup="sdp:ApplicabilityMetadataElement" type="msiar:MsiApplicationMetadataStuff"/>
+</xs:schema>

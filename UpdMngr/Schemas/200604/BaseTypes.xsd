@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema targetNamespace="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/BaseTypes.xsd"
-           elementFormDefault="qualified"
+<xs:schema id="BaseTypes"
+           targetNamespace="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/BaseTypes.xsd"
            xmlns="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/BaseTypes.xsd"
+           xmlns:bt="http://schemas.microsoft.com/wsus/2005/04/CorporatePublishing/BaseTypes.xsd"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
            attributeFormDefault="unqualified">
   <xs:simpleType name="positiveInt">
     <xs:restriction base="xs:int">
@@ -69,7 +71,7 @@
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="FileSize">
-    <xs:restriction base="positiveLong" />
+    <xs:restriction base="bt:positiveLong" />
   </xs:simpleType>
   <xs:simpleType name="Csidl">
     <xs:restriction base="xs:int" />

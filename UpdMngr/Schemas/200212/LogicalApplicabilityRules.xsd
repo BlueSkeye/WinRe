@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="LogicalApplicabilityRules"
+    targetNamespace="http://schemas.microsoft.com/wsus/2002/12/LogicalApplicabilityRules.xsd"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    xmlns="http://schemas.microsoft.com/wsus/2002/12/LogicalApplicabilityRules.xsd"
+    xmlns:lar="http://schemas.microsoft.com/wsus/2002/12/LogicalApplicabilityRules.xsd"
+    xmlns:sdp="http://schemas.microsoft.com/wsus/2002/12/SoftwareDistributionPackage.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/SoftwareDistributionPackage.xsd"
+      schemaLocation="SoftwareDistributionPackage.xsd" />
+
+  <xs:element name="True" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="False" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="And" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="sdp:ApplicabilityRuleElement" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Or" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="sdp:ApplicabilityRuleElement" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Not" substitutionGroup="sdp:ApplicabilityRuleElement">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="sdp:ApplicabilityRuleElement"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

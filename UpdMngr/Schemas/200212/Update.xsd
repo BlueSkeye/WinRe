@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="Update"
+    targetNamespace="http://schemas.microsoft.com/msus/2002/12/Update"
+    elementFormDefault="qualified"
+    xmlns="http://schemas.microsoft.com/msus/2002/12/Update"
+    xmlns:bt="http://schemas.microsoft.com/wsus/2002/12/BaseTypes.xsd"
+    xmlns:cat="http://schemas.microsoft.com/msus/2002/12/UpdateHandlers/Category"
+    xmlns:upd="http://schemas.microsoft.com/msus/2002/12/Update"
+    xmlns:sdp="http://schemas.microsoft.com/wsus/2002/12/SoftwareDistributionPackage.xsd"
+    xmlns:lar="http://schemas.microsoft.com/wsus/2002/12/LogicalApplicabilityRules.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/BaseTypes.xsd"
+      schemaLocation="BaseTypes.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/msus/2002/12/UpdateHandlers/Category"
+      schemaLocation="CategoryInformation.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/LogicalApplicabilityRules.xsd"
+      schemaLocation="LogicalApplicabilityRules.xsd" />
+  <xs:import namespace="http://schemas.microsoft.com/wsus/2002/12/SoftwareDistributionPackage.xsd"
+      schemaLocation="SoftwareDistributionPackage.xsd" />
+  
+  <xs:element name="ApplicabilityRuleElement" abstract="true"/>
+  <xs:element name="IsInstalled">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="upd:ApplicabilityRuleElement" minOccurs="0" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="IsInstallable" nillable="true">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="upd:ApplicabilityRuleElement" minOccurs="0" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ApplicabilityMetadataElement" abstract="true"/>
+
+  <xs:simpleType name="LocalizedPropertiesLanguage">
+    <xs:restriction base="xs:language" />
+  </xs:simpleType>
+
+  <xs:complexType name="HandlerSpecificData" abstract="true"/>
+
+  <xs:simpleType name="InstallationResult">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Failed" />
+      <xs:enumeration value="Succeeded" />
+      <xs:enumeration value="Cancelled" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Description">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="1500" />
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="Prerequisites" nillable="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="UpdateIdentity" type="upd:UpdateIdentityForPrerequisite" />
+        <xs:element name="AtLeastOne">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="UpdateIdentity" type="upd:UpdateIdentityForPrerequisite" maxOccurs="unbounded" />
+            </xs:sequence>
+            <xs:attribute name="IsCategory" type="xs:boolean" use="optional" default="false"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="UpdateIdentityForPrerequisite">
+    <xs:attribute name="UpdateID" type="upd:UpdateID" use="required" />
+  </xs:complexType>
+
+  <xs:simpleType name="UpdateID">
+    <xs:restriction base="bt:Guid" />
+  </xs:simpleType>  
+
+  <!-- The following definitions are inferred from retrieved documents.
+       It may be inaccurate.
+  -->
+  <xs:complexType name="UpdateIdentity">
+    <xs:attribute name="UpdateID" type="upd:UpdateID" use="required" />
+    <xs:attribute name="RevisionNumber" type="bt:positiveInt" use="required" />
+  </xs:complexType>
+
+  <xs:simpleType name="UpdateType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Software"/>
+      <xs:enumeration value="Driver"/>
+      <xs:enumeration value="Detectoid"/>
+      <xs:enumeration value="Category"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:complexType name="Properties">
+    <xs:attribute name="DefaultPropertiesLanguage" type="xs:language" use="required"/>
+    <xs:attribute name="UpdateType" type="upd:UpdateType" use="optional" default="Software"/>
+    <xs:attribute name="ExplicitlyDeployable" type="xs:boolean" use="required"/>
+    <xs:attribute name="PerUser" type="xs:boolean" use="required"/>
+    <xs:attribute name="IsPublic" type="xs:boolean" use="required"/>
+    <xs:attribute name="Handler" type="bt:HttpUrl" use="required"/>
+    <xs:attribute name="PublicationState" type="sdp:PublicationState" use="required"/>
+    <xs:attribute name="CreationDate" type="xs:dateTime" use="required"/>
+    <xs:attribute name="PublisherID" type="bt:Guid" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="LocalizedPropertiesCollection">
+    <xs:sequence>
+      <xs:element name="LocalizedProperties" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="Update">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="UpdateIdentity" type="upd:UpdateIdentity" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="Properties" type="upd:Properties" />
+        <xs:element name="LocalizedPropertiesCollection" type="upd:LocalizedPropertiesCollection" maxOccurs="unbounded"/>
+        <xs:element ref="sdp:PackageTypeSpecificData" minOccurs="0"/>
+        <xs:element name="IsInstallable" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="sdp:ApplicabilityRuleElement" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <!--<xs:element name="IsInstalled" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="sdp:ApplicabilityRuleElement" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>-->
+        <xs:element name="SupersededPackages" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="PackageID" type="bt:Guid" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Relationships" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Prerequisites" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="AtLeastOne" minOccurs="1" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="UpdateIdentity" type="upd:UpdateIdentityForPrerequisite" minOccurs="1" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                        <xs:attribute name="IsCategory" type="xs:boolean"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ApplicabilityRules" minOccurs ="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="IsInstalled" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="sdp:ApplicabilityRuleElement" minOccurs="0" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <!--<xs:element name="IsInstalled" ref="sdp:ApplicabilityRuleElement" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="sdp:ApplicabilityRuleElement" minOccurs="0" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>-->
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="HandlerSpecificData" type="cat:Category"/>
+        <!--<xs:element name="BundledPackages" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="PackageID" type="bt:Guid" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>-->
+        <!--<xs:element name="InstallableItem" type="sdp:InstallableItem" minOccurs="0" maxOccurs="unbounded"/>-->
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

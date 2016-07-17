@@ -43,6 +43,107 @@
     <Compile Include="Api\IUpstreamServerContext.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Data\BasePersistenceDocument.cs" />
+    <Compile Include="Data\MsDocuments\And.cs" />
+    <Compile Include="Data\MsDocuments\ApplicabilityRules.cs" />
+    <Compile Include="Data\MsDocuments\ApplicabilityRulesIsInstallable.cs" />
+    <Compile Include="Data\MsDocuments\ApplicabilityRulesIsInstalled.cs" />
+    <Compile Include="Data\MsDocuments\ApplicabilityRulesIsSuperseded.cs" />
+    <Compile Include="Data\MsDocuments\Category.cs" />
+    <Compile Include="Data\MsDocuments\CategoryCategoryInformation.cs" />
+    <Compile Include="Data\MsDocuments\ClusteredOS.cs" />
+    <Compile Include="Data\MsDocuments\ClusterResourceOwner.cs" />
+    <Compile Include="Data\MsDocuments\CommandLineInstallerData.cs" />
+    <Compile Include="Data\MsDocuments\CommandLineInstallerDataReturnCode.cs" />
+    <Compile Include="Data\MsDocuments\CommandLineInstallerDataReturnCodeLocalizedDescription.cs" />
+    <Compile Include="Data\MsDocuments\DriverClass.cs" />
+    <Compile Include="Data\MsDocuments\False.cs" />
+    <Compile Include="Data\MsDocuments\File.cs" />
+    <Compile Include="Data\MsDocuments\FileCompareCreationDateType.cs" />
+    <Compile Include="Data\MsDocuments\FileCompareModificationDateType.cs" />
+    <Compile Include="Data\MsDocuments\FileCompareSizeType.cs" />
+    <Compile Include="Data\MsDocuments\FileCompareVersionType.cs" />
+    <Compile Include="Data\MsDocuments\FileCreated.cs" />
+    <Compile Include="Data\MsDocuments\FileCreatedPrependRegSz.cs" />
+    <Compile Include="Data\MsDocuments\FileExists.cs" />
+    <Compile Include="Data\MsDocuments\FileExistsPrependRegSz.cs" />
+    <Compile Include="Data\MsDocuments\FileExistsType.cs" />
+    <Compile Include="Data\MsDocuments\FileModified.cs" />
+    <Compile Include="Data\MsDocuments\FileModifiedPrependRegSz.cs" />
+    <Compile Include="Data\MsDocuments\FileSize.cs" />
+    <Compile Include="Data\MsDocuments\FileSizePrependRegSz.cs" />
+    <Compile Include="Data\MsDocuments\FileVersion.cs" />
+    <Compile Include="Data\MsDocuments\FileVersionPrependRegSz.cs" />
+    <Compile Include="Data\MsDocuments\GenericQuery.cs" />
+    <Compile Include="Data\MsDocuments\HandlerSpecificData.cs" />
+    <Compile Include="Data\MsDocuments\InstallableItem.cs" />
+    <Compile Include="Data\MsDocuments\InstallationImpact.cs" />
+    <Compile Include="Data\MsDocuments\InstallationRebootBehavior.cs" />
+    <Compile Include="Data\MsDocuments\InstallationResult.cs" />
+    <Compile Include="Data\MsDocuments\InstallProperties.cs" />
+    <Compile Include="Data\MsDocuments\IsInstallable.cs" />
+    <Compile Include="Data\MsDocuments\IsInstalled.cs" />
+    <Compile Include="Data\MsDocuments\LocalizedProperties.cs" />
+    <Compile Include="Data\MsDocuments\LoopLogic.cs" />
+    <Compile Include="Data\MsDocuments\MsiApplicationMetadataStuff.cs" />
+    <Compile Include="Data\MsDocuments\MsiComponentInstalledForProduct.cs" />
+    <Compile Include="Data\MsDocuments\MsiFeatureInstalledForProduct.cs" />
+    <Compile Include="Data\MsDocuments\MsiInstallerData.cs" />
+    <Compile Include="Data\MsDocuments\MsiPatch.cs" />
+    <Compile Include="Data\MsDocuments\MsiPatchInstalledForProduct.cs" />
+    <Compile Include="Data\MsDocuments\MsiPatchMetadataStuff.cs" />
+    <Compile Include="Data\MsDocuments\MsiPatchSequenceData.cs" />
+    <Compile Include="Data\MsDocuments\MsiPatchTargetProduct.cs" />
+    <Compile Include="Data\MsDocuments\MsiProductInstalled.cs" />
+    <Compile Include="Data\MsDocuments\MspInstallerData.cs" />
+    <Compile Include="Data\MsDocuments\MsrcSeverity.cs" />
+    <Compile Include="Data\MsDocuments\MuiInstalled.cs" />
+    <Compile Include="Data\MsDocuments\MuiLanguageInstalled.cs" />
+    <Compile Include="Data\MsDocuments\Not.cs" />
+    <Compile Include="Data\MsDocuments\NumberOfProcessors.cs" />
+    <Compile Include="Data\MsDocuments\Or.cs" />
+    <Compile Include="Data\MsDocuments\Prerequisites.cs" />
+    <Compile Include="Data\MsDocuments\PrerequisitesAtLeastOne.cs" />
+    <Compile Include="Data\MsDocuments\Processor.cs" />
+    <Compile Include="Data\MsDocuments\Properties.cs" />
+    <Compile Include="Data\MsDocuments\PublicationState.cs" />
+    <Compile Include="Data\MsDocuments\RegDword.cs" />
+    <Compile Include="Data\MsDocuments\RegExpandSz.cs" />
+    <Compile Include="Data\MsDocuments\RegistryKey.cs" />
+    <Compile Include="Data\MsDocuments\RegistryValueType.cs" />
+    <Compile Include="Data\MsDocuments\RegKeyExists.cs" />
+    <Compile Include="Data\MsDocuments\RegKeyLoop.cs" />
+    <Compile Include="Data\MsDocuments\RegSz.cs" />
+    <Compile Include="Data\MsDocuments\RegSzToVersion.cs" />
+    <Compile Include="Data\MsDocuments\RegValueExists.cs" />
+    <Compile Include="Data\MsDocuments\ScalarComparison.cs" />
+    <Compile Include="Data\MsDocuments\SoftwareDistributionPackage.cs" />
+    <Compile Include="Data\MsDocuments\SoftwareDistributionPackageIsInstallable.cs" />
+    <Compile Include="Data\MsDocuments\SoftwareDistributionPackageIsInstalled.cs" />
+    <Compile Include="Data\MsDocuments\SoftwareDistributionPackagePackageTypeSpecificDataUpdateSpecificData.cs" />
+    <Compile Include="Data\MsDocuments\StringComparison.cs" />
+    <Compile Include="Data\MsDocuments\SystemMetric.cs" />
+    <Compile Include="Data\MsDocuments\True.cs" />
+    <Compile Include="Data\MsDocuments\Update.cs" />
+    <Compile Include="Data\MsDocuments\UpdateApplicabilityRules.cs" />
+    <Compile Include="Data\MsDocuments\UpdateApplicabilityRulesIsInstalled.cs" />
+    <Compile Include="Data\MsDocuments\UpdateClassification.cs" />
+    <Compile Include="Data\MsDocuments\UpdateIdentity.cs" />
+    <Compile Include="Data\MsDocuments\UpdateIdentityForPrerequisite.cs" />
+    <Compile Include="Data\MsDocuments\UpdateIsInstallable.cs" />
+    <Compile Include="Data\MsDocuments\UpdatePrerequisitesAtLeastOne.cs" />
+    <Compile Include="Data\MsDocuments\UpdateType.cs" />
+    <Compile Include="Data\MsDocuments\ValidateGUID.cs" />
+    <Compile Include="Data\MsDocuments\ValidateLanguage.cs" />
+    <Compile Include="Data\MsDocuments\ValidateVersion.cs" />
+    <Compile Include="Data\MsDocuments\ValidateVersionComparisonFilter.cs" />
+    <Compile Include="Data\MsDocuments\ValidateVersionComparisonType.cs" />
+    <Compile Include="Data\MsDocuments\WindowsDriverInstallable.cs" />
+    <Compile Include="Data\MsDocuments\WindowsDriverInstalled.cs" />
+    <Compile Include="Data\MsDocuments\WindowsDriverMetaData.cs" />
+    <Compile Include="Data\MsDocuments\WindowsDriverSuperseded.cs" />
+    <Compile Include="Data\MsDocuments\WindowsLanguage.cs" />
+    <Compile Include="Data\MsDocuments\WindowsVersion.cs" />
+    <Compile Include="Data\MsDocuments\WmiQuery.cs" />
     <Compile Include="Data\ServerIdentity.cs" />
     <Compile Include="Data\UpdateDescriptor.cs" />
     <Compile Include="Data\UpstreamServerContext.cs" />
@@ -69,7 +170,76 @@
     <Content Include="README.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Schemas\BaseTypes.xsd">
+    <None Include="Schemas\200212\BaseApplicabilityRules.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200212\BaseTypes.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200212\CategoryInformation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200212\CommandLineInstallation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200212\LogicalApplicabilityRules.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200212\MsiApplicabilityRules.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200212\MsiInstallation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200212\MspInstallation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200212\PatchApplicability.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200212\SoftwareDistributionPackage.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200212\WindowsDriver.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200604\BaseApplicabilityRules.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200604\BaseTypes.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200604\CategoryInformation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200604\CommandLineInstallation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200604\LogicalApplicabilityRules.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200604\MsiApplicabilityRules.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200604\MsiInstallation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200604\MspInstallation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200604\PatchApplicability.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200604\SoftwareDistributionPackage.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200212\Update.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200604\UpdateServicePackage.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Schemas\200604\WindowsDriver.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Wsdl\DSSAuthorization.wsdl">
