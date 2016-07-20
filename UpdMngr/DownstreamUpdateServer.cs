@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml;
 
 using UpdMngr.Api;
 using UpdMngr.WebServices;
@@ -141,6 +142,28 @@ namespace UpdMngr
         protected virtual void Dispose(bool disposing)
         {
             if (disposing) { GC.SuppressFinalize(this); }
+        }
+
+        /// <summary>Enumerate an update descriptor object for each update descriptor stored
+        /// within the given context.</summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public IEnumerable<IUpdateDescriptor> EnumerateUpdateDescriptors()
+        {
+            foreach(IUpdateDescriptor item in _persistenceProvider.EnumerateUpdateDescriptors(GetMandatoryContext())) {
+                yield return item;
+            }
+        }
+
+        /// <summary>Enumerate an XML document for each update descriptor stored within
+        /// the given context.</summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public IEnumerable<XmlDocument> EnumerateUpdateDescriptorDocuments()
+        {
+            foreach(XmlDocument item in _persistenceProvider.EnumerateUpdateDescriptorDocuments(GetMandatoryContext())) {
+                yield return item;
+            }
         }
 
         private IUpstreamServerContext GetMandatoryContext()

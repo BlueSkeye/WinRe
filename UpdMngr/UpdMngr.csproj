@@ -154,6 +154,7 @@
     <Compile Include="Api\IServerIdentity.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Helpers.cs" />
+    <Compile Include="LzxLightDecompressor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UpdateManagerException.cs" />
     <Compile Include="UpdateServerBase.cs" />

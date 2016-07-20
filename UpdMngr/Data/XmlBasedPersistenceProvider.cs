@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Serialization;
 
 using UpdMngr.Api;
@@ -26,8 +25,8 @@ namespace UpdMngr.Data
                 _baseDirectory.Create();
                 _baseDirectory.Refresh();
             }
-            if (null == UpdateSerializer) {
-                UpdateSerializer = new XmlSerializer(typeof(UpdateDescriptor));
+            if (null == UpdateDescriptorSerializer) {
+                UpdateDescriptorSerializer = new XmlSerializer(typeof(UpdateDescriptor));
             }
         }
 
@@ -46,6 +45,44 @@ namespace UpdMngr.Data
                 throw new ArgumentException();
             }
             return new UpdateDescriptor(realContainer, id, revision);
+        }
+
+        public IEnumerable<IUpdateDescriptor> EnumerateUpdateDescriptors(IUpstreamServerContext context)
+        {
+            if (null == context) {
+                throw new ArgumentNullException();
+            }
+            DirectoryInfo rootDirectory = EnsureStorageDirectory(context.Owner);
+            DirectoryInfo upstreamServerDirectory =
+                EnsureUpstreamServerContextDirectory(rootDirectory, context.ServerName);
+            foreach(DirectoryInfo updateDirectory in upstreamServerDirectory.GetDirectories()) {
+                foreach(FileInfo scannedFile in updateDirectory.GetFiles("*-Rev*.xml")) {
+                    using (FileStream input = File.Open(scannedFile.FullName, FileMode.Open, FileAccess.Read)) {
+                        yield return (IUpdateDescriptor)UpdateDescriptorSerializer.Deserialize(input);
+                    }
+                }
+            }
+            yield break;
+        }
+
+        public IEnumerable<XmlDocument> EnumerateUpdateDescriptorDocuments(IUpstreamServerContext context)
+        {
+            if (null == context) {
+                throw new ArgumentNullException();
+            }
+            DirectoryInfo rootDirectory = EnsureStorageDirectory(context.Owner);
+            DirectoryInfo upstreamServerDirectory =
+                EnsureUpstreamServerContextDirectory(rootDirectory, context.ServerName);
+            foreach(DirectoryInfo updateDirectory in upstreamServerDirectory.GetDirectories()) {
+                foreach(FileInfo scannedFile in updateDirectory.GetFiles("*-Rev*.xml")) {
+                    using (FileStream input = File.Open(scannedFile.FullName, FileMode.Open, FileAccess.Read)) {
+                        XmlDocument result = new XmlDocument();
+                        result.Load(input);
+                        yield return result;
+                    }
+                }
+            }
+            yield break;
         }
 
         private DirectoryInfo EnsureStorageDirectory(IServerIdentity owner)
@@ -194,7 +231,7 @@ namespace UpdMngr.Data
             }
             FileInfo descriptorFile = GetUpdateDescriptorFile(realDescriptor);
             using (FileStream into = File.Open(descriptorFile.FullName, FileMode.Create, FileAccess.Write)) {
-                UpdateSerializer.Serialize(into, descriptor);
+                UpdateDescriptorSerializer.Serialize(into, descriptor);
             }
             return;
         }
@@ -225,7 +262,7 @@ namespace UpdMngr.Data
         private const string UpstreamServerContextNamePattern = "USS-{0}.xml";
         private DirectoryInfo _baseDirectory;
         private static Dictionary<Type, XmlSerializer> _serializerByType;
-        private static XmlSerializer UpdateSerializer;
+        private static XmlSerializer UpdateDescriptorSerializer;
 
         internal class UpdateContainer
         {

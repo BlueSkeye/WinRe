@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml;
 
 namespace UpdMngr.Api
 {
@@ -11,6 +9,16 @@ namespace UpdMngr.Api
     public interface IPersistenceProvider
     {
         IUpdateDescriptor CreateUpdateDescriptor(object container, Guid id, int revision);
+        /// <summary>Enumerate an update descriptor object for each update descriptor stored
+        /// within the given context.</summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        IEnumerable<IUpdateDescriptor> EnumerateUpdateDescriptors(IUpstreamServerContext context);
+        /// <summary>Enumerate an XML document for each update descriptor stored within
+        /// the given context.</summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        IEnumerable<XmlDocument> EnumerateUpdateDescriptorDocuments(IUpstreamServerContext context);
         /// <summary></summary>
         /// <param name="context"></param>
         /// <param name="id"></param>

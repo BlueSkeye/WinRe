@@ -27,5 +27,17 @@ namespace UpdMngr.Data.MsDocuments
         public UpdatePrerequisitesAtLeastOne[][] Relationships { get; set; }
         public UpdateApplicabilityRules ApplicabilityRules { get; set; }
         public Category HandlerSpecificData { get; set; }
+
+        public static XmlSerializer Serializer
+        {
+            get {
+                if (null == _serializer) {
+                    _serializer = new XmlSerializer(typeof(Update));
+                }
+                return _serializer;
+            }
+        }
+
+        private static XmlSerializer _serializer;
     }
 }
